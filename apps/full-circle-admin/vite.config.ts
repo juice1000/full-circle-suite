@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
-  cacheDir: '../../node_modules/.vite/full-circle-home',
+  cacheDir: '../../node_modules/.vite/full-circle-admin',
 
   server: {
     port: 4200,

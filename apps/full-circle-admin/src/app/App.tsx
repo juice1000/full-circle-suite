@@ -8,7 +8,7 @@ export function App() {
     <div>
       <h1>
         <span> Hello there, </span>
-        Welcome full-circle-home 👋
+        Welcome full-circle-admin 👋
       </h1>
     </div>
   );
@@ -78,6 +78,6 @@ if (import.meta.vitest) {
         {/* END: routes */}
       </BrowserRouter>
     );
-    expect(getByText(/Welcome full-circle-home/gi)).toBeTruthy();
+    expect(getByText(/Welcome full-circle-admin/gi)).toBeTruthy();
   });
 }
