@@ -2,9 +2,8 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import cors from 'cors';
 
-// ***************************************** LIBRARIES ***************************************
+// ***************************************** NX LIBRARIES ***************************************
 import { whatsAppVerify, whatsAppRetreiveMessage } from '@libs/whats-app';
-
 import { gptChatResponse } from '@libs/gpt';
 
 // ************************************************************************************************
