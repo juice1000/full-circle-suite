@@ -1,7 +1,7 @@
 {
-  "name": "full-circle",
-  "$schema": "node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "src",
+  "name": "full-circle-chatbot",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/full-circle-chatbot/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -10,12 +10,12 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/full-circle",
+        "outputPath": "dist/apps/full-circle-chatbot",
         "format": ["cjs"],
         "bundle": false,
-        "main": "src/main.ts",
-        "tsConfig": "tsconfig.app.json",
-        "assets": ["src/assets"],
+        "main": "apps/full-circle-chatbot/src/main.ts",
+        "tsConfig": "apps/full-circle-chatbot/tsconfig.app.json",
+        "assets": ["apps/full-circle-chatbot/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -40,14 +40,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "full-circle:build"
+        "buildTarget": "full-circle-chatbot:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "full-circle:build:development"
+          "buildTarget": "full-circle-chatbot:build:development"
         },
         "production": {
-          "buildTarget": "full-circle:build:production"
+          "buildTarget": "full-circle-chatbot:build:production"
         }
       }
     },
@@ -55,14 +55,14 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["./src/**/*.ts"]
+        "lintFilePatterns": ["apps/full-circle-chatbot/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectName}"],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "jest.config.app.ts"
+        "jestConfig": "apps/full-circle-chatbot/jest.config.ts"
       }
     }
   },

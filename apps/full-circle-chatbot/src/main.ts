@@ -5,7 +5,7 @@ import cors from 'cors';
 // ***************************************** LIBRARIES ***************************************
 import { whatsAppVerify, whatsAppRetreiveMessage } from '@libs/whats-app';
 
-import { gptChatResponse } from '@full-circle/gpt';
+import { gptChatResponse } from '@libs/gpt';
 
 // ************************************************************************************************
 // ************************************************************************************************
