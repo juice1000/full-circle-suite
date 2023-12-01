@@ -35,8 +35,20 @@ export function whatsAppRetreiveMessage(
     return null;
   } else {
     // TODO: needs to be reworked for more stability
-    console.log(body_param.entry[0].changes[0].value.messages[0].text.body);
-    res.sendStatus(200);
-    return body_param.entry[0].changes[0].value.messages[0].text.body;
+    if (
+      body_param.entry &&
+      body_param.entry[0].changes[0].value &&
+      body_param.entry[0].changes[0].value.messages
+    ) {
+      console.log(body_param.entry[0].changes[0].value.messages[0].text.body);
+      return body_param.entry[0].changes[0].value.messages[0].text.body;
+    } else {
+      return null;
+    }
   }
+}
+
+export function helloWhatsApp() {
+  console.log('hello from whatsapp');
+  return 'hello from whatsapp';
 }

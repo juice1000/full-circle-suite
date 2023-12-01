@@ -7,8 +7,9 @@
   },
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.462.0",
     "@swc/helpers": "~0.5.2",
-    "axios": "^1.0.0",
+    "axios": "^1.6.2",
     "express": "~4.18.1",
     "express-session": "^1.17.3",
     "openai": "^4.20.1",
