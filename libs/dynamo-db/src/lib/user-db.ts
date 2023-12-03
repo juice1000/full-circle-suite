@@ -64,9 +64,9 @@ export async function createUser(phone: string) {
   return user;
 }
 
-export async function createNewUserProfile(userInfo: any) {
+export async function writeUser(userInfo: any) {
   const user: User = {
-    id: uuidv4(), // generate random UUID
+    id: userInfo.id || uuidv4(), // generate random UUID
     created: new Date(),
     firstname: userInfo.firstname,
     lastname: userInfo.lastname,
@@ -93,7 +93,7 @@ export async function createNewUserProfile(userInfo: any) {
     },
   });
   await dbClient.send(putCommand);
-  console.log('created new user');
+  console.log('written user');
 
   return user;
 }

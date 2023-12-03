@@ -4,6 +4,7 @@ import { gptChatResponse, interpretStressLevel } from '@libs/gpt';
 import {
   getUser,
   createUser,
+  writeUser,
   createMessage,
   getMessages,
   Message,
@@ -29,17 +30,11 @@ export async function whatsAppWebhook(req: Request, res: Response) {
       user = await createUser(phone);
       // Trigger GPT-model
       gptResponse = await gptChatResponse(messageText);
-
-      // Elaborate on the stress level
-      interpretStressLevel(user, messageText);
     } else {
       // Retrieve chat history
       messageHistory = await getMessages(user.id);
       // Trigger GPT-model with chat history and user data
       gptResponse = await gptChatResponse(messageText, messageHistory, user);
-
-      // Elaborate on the stress level
-      interpretStressLevel(messageText, messageHistory, user);
     }
 
     // Store new message Object in DB
@@ -64,6 +59,12 @@ export async function whatsAppWebhook(req: Request, res: Response) {
         },
       }
     );
+
+    // Elaborate on the stress level
+    await interpretStressLevel(user, messageText, messageHistory);
+    // Update User in database
+    writeUser(user);
+
     res.sendStatus(200);
   } else {
     res.sendStatus(400);

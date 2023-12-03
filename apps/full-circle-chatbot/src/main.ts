@@ -6,7 +6,7 @@ import { whatsAppWebhook } from './controller';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import { createNewUserProfile, initializeDB } from '@libs/dynamo-db';
+import { writeUser, initializeDB } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 // import { gptChatResponse } from '@libs/gpt';
 
@@ -80,6 +80,6 @@ app.get('/create-user', async (req: Request, res: Response) => {
     stressScore: 0,
   };
 
-  await createNewUserProfile(user);
+  await writeUser(user);
   res.sendStatus(200);
 });

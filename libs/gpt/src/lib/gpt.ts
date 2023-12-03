@@ -142,12 +142,12 @@ Do not suggest seeking medical professional help unless there is a serious medic
 
 export async function interpretStressLevel(
   user: any,
-  userPrompt: any,
+  prompt: any,
   messageHistory?: any
 ) {
   console.log('calling user profile adjustment');
 
-  const systemPrompt = `Analyse the user's stress level by checking his message history. Evaluate the stress level with using a metric between -1 and 1. Please answer with a single number. Most recent messages have a bigger significance than older messages.`;
+  const systemPrompt = `Analyse the user's stress level by checking his message history. Evaluate the stress level with using a metric between -1 and 1, whereas -1 is depressed and 1 is cheerful. Please answer with a single number. Most recent messages have a bigger significance than older messages.`;
   const messages = [
     {
       role: 'system',
@@ -158,7 +158,7 @@ export async function interpretStressLevel(
   if (messageHistory) {
     appendMessageHistory(messageHistory, messages);
   }
-  messages.push(userPrompt);
+  messages.push({ role: 'user', content: prompt });
 
   const completionsObject = {
     messages: messages as OpenAI.ChatCompletionMessageParam[],
@@ -174,9 +174,10 @@ export async function interpretStressLevel(
   const newUser = { ...user };
   if (!isNaN(+score)) {
     // check if a score was actually created
-    console.log('Score: ', score);
+
     newUser.stressScore = Number(completion.choices[0].message.content);
   }
-  // TODO: Update User to database
+  console.log('Score: ', score);
+
   return newUser;
 }
