@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { whatsAppRetreiveMessage } from '@libs/whats-app';
-import { gptChatResponse } from '@libs/gpt';
+import { gptChatResponse, interpretStressLevel } from '@libs/gpt';
 import {
   getUser,
   createUser,
@@ -29,11 +29,17 @@ export async function whatsAppWebhook(req: Request, res: Response) {
       user = await createUser(phone);
       // Trigger GPT-model
       gptResponse = await gptChatResponse(messageText);
+
+      // Elaborate on the stress level
+      interpretStressLevel(user, messageText);
     } else {
       // Retrieve chat history
       messageHistory = await getMessages(user.id);
       // Trigger GPT-model with chat history and user data
       gptResponse = await gptChatResponse(messageText, messageHistory, user);
+
+      // Elaborate on the stress level
+      interpretStressLevel(messageText, messageHistory, user);
     }
 
     // Store new message Object in DB
