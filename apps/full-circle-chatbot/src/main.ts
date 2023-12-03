@@ -6,7 +6,7 @@ import { whatsAppWebhook } from './controller';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import { initializeDB } from '@libs/dynamo-db';
+import { createNewUserProfile, initializeDB } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 // import { gptChatResponse } from '@libs/gpt';
 
@@ -60,4 +60,26 @@ app.get('/whatsapp-webhook', (req: Request, res: Response) => {
 app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
   // This webhook listens to incoming messages from the user
   await whatsAppWebhook(req, res);
+});
+
+// TODO: this function is still in the making and only for demo purposes
+app.get('/create-user', async (req: Request, res: Response) => {
+  // TODO: create user profile after signup
+  console.log('create demo user');
+
+  const userInfo = req.body;
+  const user = {
+    firstname: 'Julien',
+    lastname: 'Look',
+    birthdate: new Date('1996-04-25'),
+    phone: '4917643209870',
+    email: 'julienlook@gmx.de',
+    numberOfChildren: 1,
+    introduction:
+      'Julien is a father in maternal leave. He takes care of his son with little help from his wife, because she mostly works overseas and rarely comes home. His son is very anxious and often cries.',
+    stressScore: 0,
+  };
+
+  await createNewUserProfile(user);
+  res.sendStatus(200);
 });

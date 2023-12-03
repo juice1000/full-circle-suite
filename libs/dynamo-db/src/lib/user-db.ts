@@ -20,10 +20,16 @@ export async function getUser(phone: string): Promise<User | null> {
       const item = response.Items[0];
 
       const user: User = {
-        id: item.id.S || '',
-        timestamp: new Date(Number(item.timestamp.N)),
-        phone: item.phone.S || '',
-        stressScore: Number(item.stressScore?.N) || 0,
+        id: item.id.S,
+        created: new Date(Number(item.created.N)),
+        firstname: item.firstname.S,
+        lastname: item.lastname.S,
+        birthdate: new Date(Number(item.birthdate.N)),
+        phone: item.phone.S,
+        stressScore: Number(item.stressScore.N),
+        email: item.email.S,
+        numberOfChildren: Number(item.numberOfChildren.N),
+        introduction: item.introduction.S,
       };
       return user;
     } else {
@@ -39,7 +45,7 @@ export async function getUser(phone: string): Promise<User | null> {
 export async function createUser(phone: string) {
   const user: User = {
     id: uuidv4(), // generate random UUID
-    timestamp: new Date(),
+    created: new Date(),
     phone: phone,
     stressScore: 0,
   };
@@ -47,9 +53,43 @@ export async function createUser(phone: string) {
     TableName: 'full-circle-users',
     Item: {
       id: { S: user.id },
-      timestamp: { N: `${user.timestamp.getTime()}` },
+      created: { N: `${user.created.getTime()}` },
       phone: { S: `${phone}` },
       stressScore: { N: '0' },
+    },
+  });
+  await dbClient.send(putCommand);
+  console.log('created new user');
+
+  return user;
+}
+
+export async function createNewUserProfile(userInfo: any) {
+  const user: User = {
+    id: uuidv4(), // generate random UUID
+    created: new Date(),
+    firstname: userInfo.firstname,
+    lastname: userInfo.lastname,
+    birthdate: userInfo.birthdate,
+    phone: userInfo.phone,
+    email: userInfo.email,
+    numberOfChildren: userInfo.numberOfChildren,
+    introduction: userInfo.introduction,
+    stressScore: 0,
+  };
+  const putCommand = new PutItemCommand({
+    TableName: 'full-circle-users',
+    Item: {
+      id: { S: user.id },
+      created: { N: `${user.created.getTime()}` },
+      firstname: { S: user.firstname },
+      lastname: { S: user.lastname },
+      birthdate: { N: `${user.birthdate.getTime()}` },
+      phone: { S: user.phone },
+      email: { S: user.email },
+      numberOfChildren: { N: `${user.numberOfChildren}` },
+      introduction: { S: user.introduction },
+      stressScore: { N: `${user.stressScore}` },
     },
   });
   await dbClient.send(putCommand);

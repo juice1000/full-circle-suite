@@ -14,13 +14,18 @@ function generateUserInfo(user: any): string {
   if (user.firstname) {
     userInfo.push(`The name of the user is: ${user.firstname}.`);
     if (user.age) {
-      userInfo.push(`${user.firstname} is ${user.age} years old.`);
+      userInfo.push(
+        `${user.firstname} was born in ${user.birthdate.getFullYear()}.`
+      );
     }
     if (user.numberOfChildren) {
-      userInfo.push(`${user.firstname} has ${user.numberOfChildren} children.`);
-    }
-    if (user.numberOfChildren) {
-      userInfo.push(`${user.firstname} has ${user.numberOfChildren} children.`);
+      userInfo.push(
+        `${user.firstname} has ${
+          user.numberOfChildren > 1
+            ? user.numberOfChildren + ' children'
+            : `1 child`
+        }.`
+      );
     }
     if (user.introduction) {
       userInfo.push(
@@ -29,11 +34,8 @@ function generateUserInfo(user: any): string {
     }
     return userInfo.join(' ');
   } else {
-    if (user.age) {
-      userInfo.push(`The user is ${user.age} years old.`);
-    }
-    if (user.numberOfChildren) {
-      userInfo.push(`The user has ${user.numberOfChildren} children.`);
+    if (user.birthdate) {
+      userInfo.push(`The user was born in ${user.birthdate.getFullYear()}.`);
     }
     if (user.numberOfChildren) {
       userInfo.push(`The user has ${user.numberOfChildren} children.`);
@@ -83,9 +85,13 @@ Do not suggest seeking medical professional help unless there is a serious medic
 `;
   if (user) {
     const userPrompt = generateUserInfo(user);
-    systemPrompt = systemPrompt + '\n\n' + userPrompt;
+    if (userPrompt.length > 0) {
+      //console.log(userPrompt);
+      systemPrompt = systemPrompt + '\n\n' + userPrompt;
+    }
   }
 
+  // We feed this to the GPT prompt
   const messages = [
     {
       role: 'system',
@@ -107,13 +113,13 @@ Do not suggest seeking medical professional help unless there is a serious medic
     });
   }
 
+  // This is new user prompt
   const userPrompt = {
     role: 'user',
     content: prompt,
   };
   messages.push(userPrompt);
-
-  console.log('messages:', messages);
+  // console.log('messages:', messages);
 
   const completionsObject = {
     messages: messages as OpenAI.ChatCompletionMessageParam[],
@@ -121,9 +127,18 @@ Do not suggest seeking medical professional help unless there is a serious medic
     n: 1,
   };
 
+  // Calling the openai API
   const completion = await openaiClient.chat.completions.create(
     completionsObject
   );
-  console.log(completion.choices[0].message.content);
+  // console.log(completion.choices[0].message.content);
   return completion.choices[0].message.content;
+}
+
+export async function adjustUserProfile(user: any, messageHistory: any) {
+  const newUser = { ...user };
+
+  if (!newUser.firstname) {
+  }
+  return newUser;
 }

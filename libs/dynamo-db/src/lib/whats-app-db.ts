@@ -23,7 +23,7 @@ export async function getMessages(userId: string): Promise<Message[] | null> {
       items.forEach((item) => {
         const message: Message = {
           id: item.id.S || '',
-          timestamp: new Date(Number(item.timestamp.N)) || new Date(),
+          created: new Date(Number(item.created.N)) || new Date(),
           userId: userId,
           userMessage: item.userMessage.S || '',
           gptResponse: item.gptResponse.S || '',
@@ -49,7 +49,7 @@ export async function createMessage(
 ) {
   const message: Message = {
     id: uuidv4(),
-    timestamp: new Date(),
+    created: new Date(),
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
@@ -58,7 +58,7 @@ export async function createMessage(
     TableName: 'full-circle-messages',
     Item: {
       id: { S: message.id },
-      timestamp: { N: `${message.timestamp.getTime()}` },
+      created: { N: `${message.created.getTime()}` },
       userId: { S: `${message.userId}` },
       userMessage: { S: message.userMessage },
       gptResponse: { S: message.gptResponse },
