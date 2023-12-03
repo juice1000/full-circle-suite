@@ -174,7 +174,6 @@ export async function interpretStressLevel(
   const newUser = { ...user };
   if (!isNaN(+score)) {
     // check if a score was actually created
-
     newUser.stressScore = Number(completion.choices[0].message.content);
   }
   console.log('Score: ', score);
