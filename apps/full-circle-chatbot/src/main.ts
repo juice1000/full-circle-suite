@@ -1,22 +1,20 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import axios from 'axios';
+import { whatsAppVerify, helloWhatsApp } from '@libs/whats-app';
+import { whatsAppWebhook } from './controller';
 
 // ***************************************** NX LIBRARIES ***************************************
-import {
-  whatsAppVerify,
-  whatsAppRetreiveMessage,
-  helloWhatsApp,
-} from '@libs/whats-app';
-//import { initializeDB } from '@libs/dynamo-db';
+
+import { initializeDB } from '@libs/dynamo-db';
+// import { deleteTables } from '@libs/dynamo-db';
 // import { gptChatResponse } from '@libs/gpt';
 
 // ************************************************************************************************
 // ************************************************************************************************
 // ***************************************** SERVER SETUP *****************************************
-
-//initializeDB();
+// deleteTables();
+initializeDB();
 
 const app = express();
 
@@ -55,37 +53,11 @@ app.listen(port, host, () => {
 // ************************************************************************************************
 // ***************************************** REST ENDPOINTS ***************************************
 
-app.get('/webhooks', (req: Request, res: Response) => {
+app.get('/whatsapp-webhook', (req: Request, res: Response) => {
+  // The Get request verifies the validity of the webhook
   whatsAppVerify(req, res);
 });
-app.post('/webhooks', async (req: Request, res: Response) => {
+app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
   // This webhook listens to incoming messages from the user
-  const text: string | null = whatsAppRetreiveMessage(req, res);
-
-  if (text) {
-    // Step 1: Trigger GPT4
-    //await gptChatResponse(text);
-    // Step 2: fire axios response here
-    const messageBody = {
-      messaging_product: 'whatsapp',
-      to: '4917643209870',
-      text: {
-        body: "Hi, I'm still in the making, but soon I'll be able to have a genuine conversation with you!",
-      },
-    };
-    axios.post(
-      'https://graph.facebook.com/v17.0/189035427616900/messages',
-      messageBody,
-      {
-        headers: {
-          Authorization:
-            'Bearer EAAMaRZAL57xMBO96cjHipWyTzacWZB2EHlsXdcff5KbOnPOZBK1rXNljLarGtsC8kMLwnZBNPLk1gdSkn7WQ3qExzoRAmpG0F0gAO9atvtnksneMA9SZCZAd6kiiZCx7t331aJO8HzZAP8ZBE5aPiiBH56mkDHC6sTZC9QedR6MdAmfGhkAmuBzVKauZBQnxvjH6ACmFj3SHt2ZAaz9sIpH80PuG',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    res.sendStatus(200);
-  } else {
-    res.sendStatus(400);
-  }
+  await whatsAppWebhook(req, res);
 });

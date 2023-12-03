@@ -22,10 +22,7 @@ export function whatsAppVerify(req: Request, res: Response) {
  * Retrieves messages from WhatsApp and extracts the message. It will also send a response back to the webhook
  * @returns
  */
-export function whatsAppRetreiveMessage(
-  req: Request,
-  res: Response
-): string | null {
+export async function whatsAppRetreiveMessage(req: Request, res: Response) {
   const body_param = req.body;
 
   if (!body_param) {
@@ -40,8 +37,8 @@ export function whatsAppRetreiveMessage(
       body_param.entry[0].changes[0].value &&
       body_param.entry[0].changes[0].value.messages
     ) {
-      console.log(body_param.entry[0].changes[0].value.messages[0].text.body);
-      return body_param.entry[0].changes[0].value.messages[0].text.body;
+      //console.log(body_param.entry[0].changes[0].value.messages[0].text.body);
+      return body_param.entry[0].changes[0].value.messages[0];
     } else {
       return null;
     }
