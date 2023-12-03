@@ -2,7 +2,7 @@ import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
 
 export interface Message {
   id: string;
-  userid: string;
+  userId: string;
   timestamp: Date;
   userMessage: string;
   gptResponse: string;
@@ -29,7 +29,7 @@ export interface GPTSystemPrompts {
 
 export interface SelectedTrainingData {
   id: string;
-  userid: string;
+  userId: string;
   timestamp: Date;
   userMessage: string;
   gptResponse: string;

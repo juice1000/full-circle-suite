@@ -1,11 +1,18 @@
 import { Request, Response } from 'express';
 import { whatsAppRetreiveMessage } from '@libs/whats-app';
 import { gptChatResponse } from '@libs/gpt';
-import { getUser, createUser } from '@libs/dynamo-db';
+import {
+  getUser,
+  createUser,
+  createMessage,
+  getMessages,
+  Message,
+} from '@libs/dynamo-db';
 
 import axios from 'axios';
 
 export async function whatsAppWebhook(req: Request, res: Response) {
+  // Extract whats app user information
   const message = await whatsAppRetreiveMessage(req, res);
 
   if (message) {
@@ -14,14 +21,23 @@ export async function whatsAppWebhook(req: Request, res: Response) {
 
     // Retrieve user profile
     let user = await getUser(phone);
+    let messageHistory: Message[] = null;
+    let gptResponse: string = '';
+
     if (!user) {
       // Create new user if doesn't exist
       user = await createUser(phone);
+      // Trigger GPT-model
+      gptResponse = await gptChatResponse(messageText);
+    } else {
+      // Retrieve chat history
+      messageHistory = await getMessages(user.id);
+      // Trigger GPT-model with chat history and user data
+      gptResponse = await gptChatResponse(messageText, messageHistory, user);
     }
-    // Trigger GPT-model
-    const gptResponse = await gptChatResponse(messageText);
 
     // Store new message Object in DB
+    createMessage(user.id, messageText, gptResponse);
 
     // Fire axios response here
     const messageBody = {
@@ -31,13 +47,13 @@ export async function whatsAppWebhook(req: Request, res: Response) {
         body: gptResponse,
       },
     };
+
     axios.post(
       'https://graph.facebook.com/v17.0/189035427616900/messages',
       messageBody,
       {
         headers: {
           Authorization: `Bearer ${process.env.WHATSAPP_API_KEY}`,
-
           'Content-Type': 'application/json',
         },
       }

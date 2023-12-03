@@ -41,26 +41,27 @@ export async function initializeDB() {
   try {
     const results = await dbClient.listTables({});
     //console.log('available tables in DynamoDB:\n', results.TableNames);
-
-    if (!results.TableNames.includes('full-circle-messages')) {
-      await createTable(dbClient, messageSchema, 'full-circle-messages');
-    }
-    if (!results.TableNames.includes('full-circle-users')) {
-      await createTable(dbClient, userSchema, 'full-circle-users');
-    }
-    if (!results.TableNames.includes('full-circle-gpt-system-prompts')) {
-      await createTable(
-        dbClient,
-        gptSystemPromptSchema,
-        'full-circle-gpt-system-prompts'
-      );
-    }
-    if (!results.TableNames.includes('full-circle-selected-training-data')) {
-      await createTable(
-        dbClient,
-        selectedTrainingDataSchema,
-        'full-circle-selected-training-data'
-      );
+    if (results.TableNames) {
+      if (!results.TableNames.includes('full-circle-messages')) {
+        await createTable(dbClient, messageSchema, 'full-circle-messages');
+      }
+      if (!results.TableNames.includes('full-circle-users')) {
+        await createTable(dbClient, userSchema, 'full-circle-users');
+      }
+      if (!results.TableNames.includes('full-circle-gpt-system-prompts')) {
+        await createTable(
+          dbClient,
+          gptSystemPromptSchema,
+          'full-circle-gpt-system-prompts'
+        );
+      }
+      if (!results.TableNames.includes('full-circle-selected-training-data')) {
+        await createTable(
+          dbClient,
+          selectedTrainingDataSchema,
+          'full-circle-selected-training-data'
+        );
+      }
     }
 
     return;
@@ -76,17 +77,19 @@ export async function deleteTables() {
     }
     const results = await dbClient.listTables({});
     //console.log('available tables in DynamoDB:\n', results.TableNames);
-    if (results.TableNames.includes('full-circle-messages')) {
-      await deleteTable('full-circle-messages');
-    }
-    if (results.TableNames.includes('full-circle-users')) {
-      await deleteTable('full-circle-users');
-    }
-    if (results.TableNames.includes('full-circle-gpt-system-prompts')) {
-      await deleteTable('full-circle-gpt-system-prompts');
-    }
-    if (results.TableNames.includes('full-circle-selected-training-data')) {
-      await deleteTable('full-circle-selected-training-data');
+    if (results.TableNames) {
+      if (results.TableNames.includes('full-circle-messages')) {
+        await deleteTable('full-circle-messages');
+      }
+      if (results.TableNames.includes('full-circle-users')) {
+        await deleteTable('full-circle-users');
+      }
+      if (results.TableNames.includes('full-circle-gpt-system-prompts')) {
+        await deleteTable('full-circle-gpt-system-prompts');
+      }
+      if (results.TableNames.includes('full-circle-selected-training-data')) {
+        await deleteTable('full-circle-selected-training-data');
+      }
     }
   } catch (err) {
     console.error(err);

@@ -16,14 +16,14 @@ export async function getUser(phone: string): Promise<User | null> {
     //   const command = new GetItemCommand(params);
     const response = await dbClient.scan(params);
 
-    if (response.Items.length > 0) {
+    if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
 
       const user: User = {
-        id: item.id.S,
-        timestamp: new Date(item.timestamp.N),
-        phone: item.phone.S,
-        stressScore: Number(item.stressScore.N),
+        id: item.id.S || '',
+        timestamp: new Date(Number(item.timestamp.N)),
+        phone: item.phone.S || '',
+        stressScore: Number(item.stressScore?.N) || 0,
       };
       return user;
     } else {
@@ -37,7 +37,7 @@ export async function getUser(phone: string): Promise<User | null> {
 }
 
 export async function createUser(phone: string) {
-  const user = {
+  const user: User = {
     id: uuidv4(), // generate random UUID
     timestamp: new Date(),
     phone: phone,
