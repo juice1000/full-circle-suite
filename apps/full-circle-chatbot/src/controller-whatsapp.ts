@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
+import { sendUserMessage, whatsAppRetreiveMessage } from '@libs/whats-app';
 import {
-  sendMessage,
-  sendUserMessage,
-  whatsAppRetreiveMessage,
-} from '@libs/whats-app';
-import { gptChatResponse, interpretStressLevel } from '@libs/gpt';
+  gptChatResponse,
+  gptExerciseResponse,
+  interpretStressLevel,
+} from '@libs/gpt';
 import {
   getUser,
   createUser,
@@ -12,9 +12,10 @@ import {
   createMessage,
   getMessages,
   Message,
+  getExercise,
 } from '@libs/dynamo-db';
 
-export async function whatsAppWebhook(req: Request, res: Response) {
+export async function messageProcessor(req: Request, res: Response) {
   // Extract whats app user information
   const message = await whatsAppRetreiveMessage(req, res);
 
@@ -33,12 +34,29 @@ export async function whatsAppWebhook(req: Request, res: Response) {
       // Trigger GPT-model
       gptResponse = await gptChatResponse(messageText);
     } else {
+      // Retrieve chat history
+      messageHistory = await getMessages(user.id);
       // Check if user in exercise mode
       if (user.exerciseMode) {
-        const gptResonse = await gptChatResponse(messageText);
+        const exercise = await getExercise(user.exerciseName);
+        if (user.exerciseStep + 1 < exercise.steps) {
+          gptResponse = await gptExerciseResponse(
+            messageText,
+            messageHistory,
+            user,
+            exercise
+          );
+        } else {
+          user.exerciseMode = false;
+          user.exerciseName = '';
+          user.exerciseStep = 0;
+          gptResponse = await gptChatResponse(
+            messageText,
+            messageHistory,
+            user
+          );
+        }
       } else {
-        // Retrieve chat history
-        messageHistory = await getMessages(user.id);
         // Trigger GPT-model with chat history and user data
         gptResponse = await gptChatResponse(messageText, messageHistory, user);
       }
@@ -50,18 +68,17 @@ export async function whatsAppWebhook(req: Request, res: Response) {
     sendUserMessage(phone, gptResponse);
     // Elaborate on the stress level
     await interpretStressLevel(user, messageText, messageHistory);
-    // Update User in database
-    writeUser(user);
 
     if (user.stressScore < -0.5) {
-      // Run stress exercise
+      // Initiate stress exercise
       user.exerciseMode = true;
       user.exerciseName = 'mental-distress';
       user.exerciseStep = 0;
-
-      const message = `I understand you've been facing challenges with your baby's sleep. Can you share more about what specifically has been happening?`;
-      sendUserMessage(phone, message);
+      const exercise = await getExercise(user.exerciseName);
+      sendUserMessage(phone, exercise.questions[0]);
     }
+    // Update User in database
+    writeUser(user);
 
     res.sendStatus(200);
   } else {

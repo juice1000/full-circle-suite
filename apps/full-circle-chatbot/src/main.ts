@@ -1,20 +1,19 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import { whatsAppVerify } from '@libs/whats-app';
-import { whatsAppWebhook } from './controller';
+import { messageProcessor } from './controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 
 import { writeUser, initializeDB, createExercise } from '@libs/dynamo-db';
+import { whatsAppVerify } from '@libs/whats-app';
 // import { deleteTables } from '@libs/dynamo-db';
-// import { gptChatResponse } from '@libs/gpt';
+// deleteTables();
+initializeDB();
 
 // ************************************************************************************************
 // ************************************************************************************************
 // ***************************************** SERVER SETUP *****************************************
-// deleteTables();
-initializeDB();
 
 const app = express();
 
@@ -54,7 +53,7 @@ app.get('/whatsapp-webhook', (req: Request, res: Response) => {
 });
 app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
   // This webhook listens to incoming messages from the user
-  await whatsAppWebhook(req, res);
+  await messageProcessor(req, res);
 });
 
 // TODO: this function is still in the making and only for demo purposes
@@ -79,6 +78,7 @@ app.get('/create-user', async (req: Request, res: Response) => {
 });
 
 app.get('/create-exercise', async (req, res) => {
+  // TODO: create exercises through admin panel
   console.log('create demo exercise');
   const name = 'mental-distress';
   const steps = 12;

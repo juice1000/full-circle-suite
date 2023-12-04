@@ -57,7 +57,7 @@ export async function createMessage(
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
-    gptModel: process.env.GPT_MODEL,
+    gptModel: process.env.GPT_MODEL || '',
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-messages',
@@ -67,6 +67,7 @@ export async function createMessage(
       userId: { S: `${message.userId}` },
       userMessage: { S: message.userMessage },
       gptResponse: { S: message.gptResponse },
+      gptModel: { S: message.gptModel },
     },
   });
   await dbClient.send(putCommand);
