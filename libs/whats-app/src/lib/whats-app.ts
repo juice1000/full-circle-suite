@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import axios, { AxiosResponse } from 'axios';
 
 /**
  * Verifies the configured Webhook from WhatsApp. This function is called when WhatsApp sends a request to your server to verify that the request is indeed coming from WhatsApp.
@@ -45,7 +46,28 @@ export async function whatsAppRetreiveMessage(req: Request, res: Response) {
   }
 }
 
-export function helloWhatsApp() {
-  console.log('hello from whatsapp');
-  return 'hello from whatsapp';
+export async function sendUserMessage(
+  phone: string,
+  gptResponse: string
+): Promise<AxiosResponse> {
+  // Fire axios response here
+  const messageBody = {
+    messaging_product: 'whatsapp',
+    to: phone,
+    text: {
+      body: gptResponse,
+    },
+  };
+
+  const response = axios.post(
+    'https://graph.facebook.com/v17.0/189035427616900/messages',
+    messageBody,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.WHATSAPP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response;
 }

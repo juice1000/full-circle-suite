@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { whatsAppRetreiveMessage } from '@libs/whats-app';
+import {
+  sendMessage,
+  sendUserMessage,
+  whatsAppRetreiveMessage,
+} from '@libs/whats-app';
 import { gptChatResponse, interpretStressLevel } from '@libs/gpt';
 import {
   getUser,
@@ -9,8 +13,6 @@ import {
   getMessages,
   Message,
 } from '@libs/dynamo-db';
-
-import axios from 'axios';
 
 export async function whatsAppWebhook(req: Request, res: Response) {
   // Extract whats app user information
@@ -31,39 +33,35 @@ export async function whatsAppWebhook(req: Request, res: Response) {
       // Trigger GPT-model
       gptResponse = await gptChatResponse(messageText);
     } else {
-      // Retrieve chat history
-      messageHistory = await getMessages(user.id);
-      // Trigger GPT-model with chat history and user data
-      gptResponse = await gptChatResponse(messageText, messageHistory, user);
+      // Check if user in exercise mode
+      if (user.exerciseMode) {
+        const gptResonse = await gptChatResponse(messageText);
+      } else {
+        // Retrieve chat history
+        messageHistory = await getMessages(user.id);
+        // Trigger GPT-model with chat history and user data
+        gptResponse = await gptChatResponse(messageText, messageHistory, user);
+      }
     }
 
     // Store new message Object in DB
     createMessage(user.id, messageText, gptResponse);
-
-    // Fire axios response here
-    const messageBody = {
-      messaging_product: 'whatsapp',
-      to: phone,
-      text: {
-        body: gptResponse,
-      },
-    };
-
-    axios.post(
-      'https://graph.facebook.com/v17.0/189035427616900/messages',
-      messageBody,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.WHATSAPP_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
+    // Send message to user
+    sendUserMessage(phone, gptResponse);
     // Elaborate on the stress level
     await interpretStressLevel(user, messageText, messageHistory);
     // Update User in database
     writeUser(user);
+
+    if (user.stressScore < -0.5) {
+      // Run stress exercise
+      user.exerciseMode = true;
+      user.exerciseName = 'mental-distress';
+      user.exerciseStep = 0;
+
+      const message = `I understand you've been facing challenges with your baby's sleep. Can you share more about what specifically has been happening?`;
+      sendUserMessage(phone, message);
+    }
 
     res.sendStatus(200);
   } else {

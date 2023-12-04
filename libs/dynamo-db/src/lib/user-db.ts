@@ -2,7 +2,7 @@ import { dbClient } from './dynamo-db';
 import { PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
-import { User } from './table-schemas';
+import { User } from './db-types';
 
 export async function getUser(phone: string): Promise<User | null> {
   try {
@@ -30,6 +30,9 @@ export async function getUser(phone: string): Promise<User | null> {
         email: item.email.S,
         numberOfChildren: Number(item.numberOfChildren.N),
         introduction: item.introduction.S,
+        exerciseMode: item.exerciseMode.BOOL,
+        exerciseName: item.exerciseName.S,
+        exerciseStep: Number(item.exerciseStep.N),
       };
       return user;
     } else {
@@ -48,6 +51,7 @@ export async function createUser(phone: string) {
     created: new Date(),
     phone: phone,
     stressScore: 0,
+    exerciseMode: false,
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-users',
@@ -64,7 +68,8 @@ export async function createUser(phone: string) {
   return user;
 }
 
-export async function writeUser(userInfo: any) {
+export async function writeUser(userInfo: User | any) {
+  // TODO: remove "any" as this eradicates type safety
   const user: User = {
     id: userInfo.id || uuidv4(), // generate random UUID
     created: new Date(),
@@ -76,6 +81,9 @@ export async function writeUser(userInfo: any) {
     numberOfChildren: userInfo.numberOfChildren,
     introduction: userInfo.introduction,
     stressScore: 0,
+    exerciseMode: userInfo.exerciseMode,
+    exerciseName: userInfo.exerciseName,
+    exerciseStep: userInfo.exerciseStep,
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-users',
@@ -90,6 +98,9 @@ export async function writeUser(userInfo: any) {
       numberOfChildren: { N: `${user.numberOfChildren}` },
       introduction: { S: user.introduction },
       stressScore: { N: `${user.stressScore}` },
+      exerciseMode: { BOOL: user.exerciseMode },
+      exerciseName: { S: user.exerciseName },
+      exerciseStep: { N: `${user.exerciseStep}` },
     },
   });
   await dbClient.send(putCommand);

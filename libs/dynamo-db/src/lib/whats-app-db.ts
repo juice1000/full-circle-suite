@@ -2,9 +2,12 @@ import { dbClient } from './dynamo-db';
 import { PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Message } from './table-schemas';
+import { Message } from './db-types';
 
-export async function getMessages(userId: string): Promise<Message[] | null> {
+export async function getMessages(
+  userId: string,
+  limit?: number
+): Promise<Message[] | null> {
   try {
     const params = {
       TableName: 'full-circle-messages',
@@ -12,7 +15,7 @@ export async function getMessages(userId: string): Promise<Message[] | null> {
       ExpressionAttributeValues: {
         ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-      Limit: 5,
+      Limit: limit || 5,
     };
     //   const command = new GetItemCommand(params);
     const response = await dbClient.scan(params);
@@ -22,11 +25,12 @@ export async function getMessages(userId: string): Promise<Message[] | null> {
       const messages: Message[] = [];
       items.forEach((item) => {
         const message: Message = {
-          id: item.id.S || '',
-          created: new Date(Number(item.created.N)) || new Date(),
+          id: item.id.S,
+          created: new Date(Number(item.created.N)),
           userId: userId,
-          userMessage: item.userMessage.S || '',
-          gptResponse: item.gptResponse.S || '',
+          userMessage: item.userMessage.S,
+          gptResponse: item.gptResponse.S,
+          gptModel: item.gptModel.S,
         };
         messages.push(message);
       });
@@ -53,6 +57,7 @@ export async function createMessage(
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
+    gptModel: process.env.GPT_MODEL,
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-messages',

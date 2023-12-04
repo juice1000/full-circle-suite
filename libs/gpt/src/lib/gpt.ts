@@ -2,11 +2,12 @@
 import OpenAI from 'openai';
 
 let openaiClient: OpenAI;
+let gptModel: string = process.env.GPT_MODEL || 'gpt-3.5-turbo-1106';
 /**
  * Initializes the OpenAI client with an initial system prompt
  */
 export async function gptSetup() {
-  openaiClient = new OpenAI({ apiKey: process.env['OPENAI_API_KEY'] });
+  openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
 function generateUserInfo(user: any): string {
@@ -127,7 +128,7 @@ Do not suggest seeking medical professional help unless there is a serious medic
 
   const completionsObject = {
     messages: messages as OpenAI.ChatCompletionMessageParam[],
-    model: 'gpt-4-1106-preview',
+    model: gptModel,
     n: 1,
   };
 
@@ -162,7 +163,7 @@ export async function interpretStressLevel(
 
   const completionsObject = {
     messages: messages as OpenAI.ChatCompletionMessageParam[],
-    model: 'gpt-4-1106-preview',
+    model: gptModel,
     n: 1,
   };
 
