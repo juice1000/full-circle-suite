@@ -5,7 +5,12 @@ import { messageProcessor } from './controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import { writeUser, initializeDB, createExercise } from '@libs/dynamo-db';
+import {
+  writeUser,
+  initializeDB,
+  createExercise,
+  getExercise,
+} from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
 // import { deleteTables } from '@libs/dynamo-db';
 // deleteTables();
@@ -53,7 +58,12 @@ app.get('/whatsapp-webhook', (req: Request, res: Response) => {
 });
 app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
   // This webhook listens to incoming messages from the user
-  await messageProcessor(req, res);
+  try {
+    await messageProcessor(req, res);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(400);
+  }
 });
 
 // TODO: this function is still in the making and only for demo purposes
@@ -71,6 +81,9 @@ app.get('/create-user', async (req: Request, res: Response) => {
     introduction:
       'Julien is a father in maternal leave. He takes care of his son with little help from his wife, because she mostly works overseas and rarely comes home. His son is very anxious and often cries.',
     stressScore: 0,
+    exerciseMode: false,
+    exerciseName: '',
+    exerciseStep: 0,
   };
 
   await writeUser(user);

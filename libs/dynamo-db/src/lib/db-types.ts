@@ -21,6 +21,7 @@ export interface User {
   introduction?: string;
   exerciseName?: string;
   exerciseStep?: number;
+  exerciseLastParticipated?: Date;
 }
 
 export interface GPTSystemPrompts {
@@ -41,7 +42,7 @@ export interface SelectedTrainingData {
 export interface GuidedExercise {
   id: string;
   created: Date;
-  name: string;
+  exerciseName: string;
   steps: number;
   questions: string[];
 }

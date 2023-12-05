@@ -6,6 +6,7 @@ export async function executeGPTModel(
   prompt: string
 ): Promise<string> {
   try {
+    console.log('\nCalling executeGPTModel\n');
     const gptModel: string = process.env.GPT_MODEL || '';
     // This is new user prompt
     const userPrompt = {

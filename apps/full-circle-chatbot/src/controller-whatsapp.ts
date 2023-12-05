@@ -1,86 +1,34 @@
 import { Request, Response } from 'express';
 import { sendUserMessage, whatsAppRetreiveMessage } from '@libs/whats-app';
-import {
-  gptChatResponse,
-  gptExerciseResponse,
-  interpretStressLevel,
-} from '@libs/gpt';
-import {
-  getUser,
-  createUser,
-  writeUser,
-  createMessage,
-  getMessages,
-  Message,
-  getExercise,
-} from '@libs/dynamo-db';
+
+import { getUser } from '@libs/dynamo-db';
+import { controllerMessageLevel } from './controllers/controller-message-level';
 
 export async function messageProcessor(req: Request, res: Response) {
   // Extract whats app user information
   const message = await whatsAppRetreiveMessage(req, res);
+
+  // TODO: trottling messages in Redis database
 
   if (message) {
     const phone = message.from;
     const messageText = message.text.body;
 
     // Retrieve user profile
-    let user = await getUser(phone);
-    let messageHistory: Message[] = null;
-    let gptResponse: string = '';
+    const user = await getUser(phone);
 
     if (!user) {
-      // Create new user if doesn't exist
-      user = await createUser(phone);
-      // Trigger GPT-model
-      gptResponse = await gptChatResponse(messageText);
+      // User not registered with the service yet
+      // Send message to this phone number to sign up for services
+      console.log('not a registered phone number: ', phone);
+      sendUserMessage(
+        phone,
+        'Hello, you seem to be not registered with our service. Please sign up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.'
+      );
+      res.sendStatus(200);
     } else {
-      // Retrieve chat history
-      messageHistory = await getMessages(user.id);
-      // Check if user in exercise mode
-      if (user.exerciseMode) {
-        const exercise = await getExercise(user.exerciseName);
-        if (user.exerciseStep + 1 < exercise.steps) {
-          gptResponse = await gptExerciseResponse(
-            messageText,
-            messageHistory,
-            user,
-            exercise
-          );
-        } else {
-          user.exerciseMode = false;
-          user.exerciseName = '';
-          user.exerciseStep = 0;
-          gptResponse = await gptChatResponse(
-            messageText,
-            messageHistory,
-            user
-          );
-        }
-      } else {
-        // Trigger GPT-model with chat history and user data
-        gptResponse = await gptChatResponse(messageText, messageHistory, user);
-      }
+      controllerMessageLevel(user, messageText, res);
     }
-
-    // Store new message Object in DB
-    createMessage(user.id, messageText, gptResponse);
-    // Send message to user
-    sendUserMessage(phone, gptResponse);
-    // Elaborate on the stress level
-    await interpretStressLevel(user, messageText, messageHistory);
-
-    if (user.stressScore < -0.5) {
-      // Initiate stress exercise
-      user.exerciseMode = true;
-      user.exerciseName = 'mental-distress';
-      user.exerciseStep = 0;
-      const exercise = await getExercise(user.exerciseName);
-      sendUserMessage(phone, exercise.questions[0]);
-    }
-    // Update User in database
-    writeUser(user);
-
-    res.sendStatus(200);
   } else {
     res.sendStatus(400);
   }

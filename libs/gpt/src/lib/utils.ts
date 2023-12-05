@@ -4,6 +4,7 @@
  * @returns user information
  */
 export function generateUserInfo(user: any): string {
+  console.log('\nCalling generateUserInfo\n');
   const userInfo = [];
   if (user.firstname) {
     userInfo.push(`The name of the user is: ${user.firstname}.`);
@@ -49,6 +50,7 @@ export function generateUserInfo(user: any): string {
  * @param messages array that will be used for a new GPT prompt
  */
 export function appendMessageHistory(messageHistory: any, messages: any[]) {
+  console.log('\nCalling appendMessageHistory\n');
   messageHistory.forEach((message: any) => {
     const userMessage = {
       role: 'user',
@@ -60,6 +62,20 @@ export function appendMessageHistory(messageHistory: any, messages: any[]) {
     };
     messages.push(userMessage);
     messages.push(gptResponse);
+  });
+}
+
+export function appendMessageHistoryStressLevel(
+  messageHistory: any,
+  messages: any[]
+) {
+  console.log('\nCalling appendMessageHistoryStressLevel\n');
+  messageHistory.forEach((message: any) => {
+    const userMessage = {
+      role: 'user',
+      content: message.userMessage,
+    };
+    messages.push(userMessage);
   });
 }
 
@@ -82,4 +98,4 @@ Do not suggest seeking medical professional help unless there is a serious medic
 `;
 
 export const exerciseUtilSystemPrompt =
-  '\n\nFollow up with what the user said the last time and add the following question at the end of your answer:\n';
+  '\n\nFollow up with what the user said the last time and move on in the conversation with another question:\n';

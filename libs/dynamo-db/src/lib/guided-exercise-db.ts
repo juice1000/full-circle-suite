@@ -10,23 +10,25 @@ export async function getExercise(
   try {
     const params = {
       TableName: 'full-circle-guided-exercises',
-      FilterExpression: 'name = :value',
+      FilterExpression: 'exerciseName = :value',
       ExpressionAttributeValues: {
         ':value': { S: name },
       },
       Limit: 1,
     };
+
     //   const command = new GetItemCommand(params);
     const response = await dbClient.scan(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
+
       const exercise: GuidedExercise = {
         id: item.id.S,
         created: new Date(Number(item.created.N)),
-        name: item.name.S,
+        exerciseName: item.exerciseName.S,
         steps: Number(item.steps.N),
-        questions: item.questions.SS,
+        questions: item.questions.L.map((question) => question.S),
       };
 
       return exercise;
@@ -47,23 +49,28 @@ export async function createExercise(
 ) {
   const exercise: GuidedExercise = {
     id: uuidv4(),
-    name: name,
+    exerciseName: name,
     created: new Date(),
     steps: steps,
     questions: questions,
   };
+
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-guided-exercises',
     Item: {
       id: { S: exercise.id },
-      name: { S: exercise.name },
+      exerciseName: { S: exercise.exerciseName },
       created: { N: `${exercise.created.getTime()}` },
       steps: { N: `${exercise.steps}` },
-      questions: { SS: exercise.questions },
+      questions: {
+        L: exercise.questions.map((question) => {
+          return { S: question };
+        }),
+      },
     },
   });
   await dbClient.send(putCommand);
-  console.log('created new message');
+  console.log('created new exercise');
 
   return exercise;
 }

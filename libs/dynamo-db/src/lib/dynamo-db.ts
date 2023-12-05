@@ -63,11 +63,11 @@ export async function initializeDB() {
           'full-circle-selected-training-data'
         );
       }
-      if (!results.TableNames.includes('full-circle-guided-exercise')) {
+      if (!results.TableNames.includes('full-circle-guided-exercises')) {
         await createTable(
           dbClient,
           guidedExerciseSchema,
-          'full-circle-selected-guided-exercise'
+          'full-circle-guided-exercises'
         );
       }
     }
@@ -98,8 +98,8 @@ export async function deleteTables() {
       if (results.TableNames.includes('full-circle-selected-training-data')) {
         await deleteTable('full-circle-selected-training-data');
       }
-      if (results.TableNames.includes('full-circle-guided-exercise')) {
-        await deleteTable('full-circle-selected-guided-exercise');
+      if (results.TableNames.includes('full-circle-guided-exercises')) {
+        await deleteTable('full-circle-guided-exercises');
       }
     }
   } catch (err) {

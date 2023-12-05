@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build:serve:chatbot": "npx nx run full-circle-chatbot:build & npx nx run full-circle-chatbot:serve"
+    "build:serve:chatbot": "npx nx run full-circle-chatbot:build & sleep 3 & npx nx run full-circle-chatbot:serve"
   },
   "private": true,
   "dependencies": {

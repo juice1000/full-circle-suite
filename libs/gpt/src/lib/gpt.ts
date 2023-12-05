@@ -4,17 +4,16 @@ import {
   appendMessageHistory,
   systemPrompt,
   exerciseUtilSystemPrompt,
+  appendMessageHistoryStressLevel,
 } from './utils';
 import { executeGPTModel } from './execute-gpt';
 import OpenAI from 'openai';
 
-let openaiClient: OpenAI;
-
 /**
  * Initializes the OpenAI client with an initial system prompt
  */
-export async function gptSetup() {
-  openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export function gptSetup(): OpenAI {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
 /**
@@ -28,11 +27,8 @@ export async function gptChatResponse(
   messageHistory?: any,
   user?: any
 ) {
-  if (!openaiClient) {
-    console.log('GPT not setup yet! Initialize Gpt model...');
-    await gptSetup();
-    console.log('Done with GPT setup');
-  }
+  console.log('\nCalling gptChatResponse\n');
+  const openaiClient: OpenAI = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;
   if (user) {
@@ -72,9 +68,10 @@ export async function interpretStressLevel(
   prompt: any,
   messageHistory?: any
 ) {
-  console.log('calling user profile adjustment');
+  console.log('\nCalling interpretStressLevel\n');
+  const openaiClient = gptSetup();
 
-  const systemPrompt = `Analyse the user's stress level by checking his message history. Evaluate the stress level with using a metric between -1 and 1, whereas -1 is depressed and 1 is cheerful. Please answer with a single number. Most recent messages have a bigger significance than older messages.`;
+  const systemPrompt = `Provide a stress level evaluation for the user based on the given message. Use a number between -1 and 1, where -1 indicates high stress or sadness, and 1 indicates low stress or cheerfulness. Consider the user's emotional state in their most recent message as having a greater impact. The user's messages indicate their distress related to their crying child. Give a single number as your response.`;
   const messages = [
     {
       role: 'system',
@@ -83,19 +80,24 @@ export async function interpretStressLevel(
   ];
 
   if (messageHistory) {
-    appendMessageHistory(messageHistory, messages);
+    appendMessageHistoryStressLevel(messageHistory, messages);
   }
 
-  const score = await executeGPTModel(messages, openaiClient, prompt);
+  const scoreCompletion = await executeGPTModel(messages, openaiClient, prompt);
 
-  const newUser = { ...user };
-  if (!isNaN(+score)) {
+  if (!isNaN(+scoreCompletion)) {
     // check if a score was actually created
-    newUser.stressScore = Number(+score);
-  }
-  console.log('Score: ', score);
+    user.stressScore = Number(+scoreCompletion);
+  } else {
+    const re = new RegExp('(-*\\d\\.*\\d*)');
+    const score = scoreCompletion.match(re);
+    console.log(scoreCompletion);
 
-  return newUser;
+    if (score) {
+      console.log('score: ', score[0]);
+      user.stressScore = score[0];
+    }
+  }
 }
 
 export async function gptExerciseResponse(
@@ -104,19 +106,21 @@ export async function gptExerciseResponse(
   user: any,
   exercise: any
 ) {
-  if (!openaiClient) {
-    console.log('GPT not setup yet! Initialize Gpt model...');
-    await gptSetup();
-    console.log('Done with GPT setup');
-  }
+  console.log('\nCalling gptExerciseResponse\n');
+  const openaiClient = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;
   const userInfo = generateUserInfo(user);
-  console.log(user.exerciseStep, exercise.questions[user.exerciseStep + 1]);
+  console.log(
+    'Exercise Step: ',
+    user.exerciseStep,
+    ', Exercise Question: ',
+    exercise.questions[user.exerciseStep]
+  );
   if (userInfo.length > 0) {
     scopedSystemPrompt = scopedSystemPrompt + '\n\n' + userInfo;
   }
-  const exercisePrompt = exercise.questions[user.exerciseStep + 1];
+  const exercisePrompt = exercise.questions[user.exerciseStep];
   scopedSystemPrompt =
     scopedSystemPrompt + exerciseUtilSystemPrompt + exercisePrompt;
 

@@ -22,17 +22,20 @@ export async function getUser(phone: string): Promise<User | null> {
       const user: User = {
         id: item.id.S,
         created: new Date(Number(item.created.N)),
-        firstname: item.firstname.S,
-        lastname: item.lastname.S,
-        birthdate: new Date(Number(item.birthdate.N)),
+        firstname: item.firstname?.S,
+        lastname: item.lastname?.S,
+        birthdate: new Date(Number(item.birthdate?.N)),
         phone: item.phone.S,
         stressScore: Number(item.stressScore.N),
-        email: item.email.S,
-        numberOfChildren: Number(item.numberOfChildren.N),
-        introduction: item.introduction.S,
+        email: item.email?.S,
+        numberOfChildren: Number(item.numberOfChildren?.N),
+        introduction: item.introduction?.S,
         exerciseMode: item.exerciseMode.BOOL,
-        exerciseName: item.exerciseName.S,
-        exerciseStep: Number(item.exerciseStep.N),
+        exerciseName: item.exerciseName?.S,
+        exerciseStep: Number(item.exerciseStep?.N),
+        exerciseLastParticipated: new Date(
+          Number(item.exerciseLastParticipated?.N)
+        ),
       };
       return user;
     } else {
@@ -40,7 +43,7 @@ export async function getUser(phone: string): Promise<User | null> {
       return null;
     }
   } catch (err) {
-    console.log('no user found');
+    console.log('error retrieving user');
     return null;
   }
 }
@@ -84,6 +87,7 @@ export async function writeUser(userInfo: User | any) {
     exerciseMode: userInfo.exerciseMode,
     exerciseName: userInfo.exerciseName,
     exerciseStep: userInfo.exerciseStep,
+    exerciseLastParticipated: userInfo.exerciseLastParticipated,
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-users',
@@ -101,6 +105,9 @@ export async function writeUser(userInfo: User | any) {
       exerciseMode: { BOOL: user.exerciseMode },
       exerciseName: { S: user.exerciseName },
       exerciseStep: { N: `${user.exerciseStep}` },
+      exerciseLastParticipated: {
+        N: `${user.exerciseLastParticipated.getTime()}`,
+      },
     },
   });
   await dbClient.send(putCommand);

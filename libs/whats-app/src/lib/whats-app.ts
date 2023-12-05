@@ -7,6 +7,7 @@ import axios, { AxiosResponse } from 'axios';
  */
 export function whatsAppVerify(req: Request, res: Response) {
   // This is required for verification of the webhook
+  console.log('\nCalling whatsAppVerify\n');
   const verifyToken = 'webhook-verify-token';
   if (
     req.query['hub.mode'] == 'subscribe' &&
@@ -24,6 +25,7 @@ export function whatsAppVerify(req: Request, res: Response) {
  * @returns
  */
 export async function whatsAppRetreiveMessage(req: Request, res: Response) {
+  // console.log('\nCalling whatsAppRetreiveMessage\n');
   const body_param = req.body;
 
   if (!body_param) {
@@ -49,25 +51,31 @@ export async function whatsAppRetreiveMessage(req: Request, res: Response) {
 export async function sendUserMessage(
   phone: string,
   gptResponse: string
-): Promise<AxiosResponse> {
-  // Fire axios response here
-  const messageBody = {
-    messaging_product: 'whatsapp',
-    to: phone,
-    text: {
-      body: gptResponse,
-    },
-  };
-
-  const response = axios.post(
-    'https://graph.facebook.com/v17.0/189035427616900/messages',
-    messageBody,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.WHATSAPP_API_KEY}`,
-        'Content-Type': 'application/json',
+): Promise<AxiosResponse | undefined> {
+  try {
+    console.log('\nCalling sendUserMessage\n');
+    // Fire axios response here
+    const messageBody = {
+      messaging_product: 'whatsapp',
+      to: phone,
+      text: {
+        body: gptResponse,
       },
-    }
-  );
-  return response;
+    };
+
+    const response = axios.post(
+      'https://graph.facebook.com/v17.0/189035427616900/messages',
+      messageBody,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.WHATSAPP_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response;
+  } catch (err) {
+    console.error(err);
+    return;
+  }
 }

@@ -11,14 +11,15 @@ export async function getMessages(
   try {
     const params = {
       TableName: 'full-circle-messages',
-      FilterExpression: 'userId = :value',
+      KeyConditionExpression: 'userId = :value',
+      ScanIndexForward: true,
+      Limit: limit || 5,
       ExpressionAttributeValues: {
         ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-      Limit: limit || 5,
     };
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await dbClient.query(params);
 
     if (response.Items && response.Items.length > 0) {
       const items = response.Items;

@@ -3,15 +3,17 @@ import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
 export const messageSchema: CreateTableCommandInput = {
   AttributeDefinitions: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
