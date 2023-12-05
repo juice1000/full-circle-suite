@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from 'axios';
  */
 export function whatsAppVerify(req: Request, res: Response) {
   // This is required for verification of the webhook
-  console.log('\nCalling whatsAppVerify\n');
+  // console.log('\nCalling whatsAppVerify\n');
   const verifyToken = 'webhook-verify-token';
   if (
     req.query['hub.mode'] == 'subscribe' &&
@@ -53,7 +53,7 @@ export async function sendUserMessage(
   gptResponse: string
 ): Promise<AxiosResponse | undefined> {
   try {
-    console.log('\nCalling sendUserMessage\n');
+    // console.log('\nCalling sendUserMessage\n');
     // Fire axios response here
     const messageBody = {
       messaging_product: 'whatsapp',

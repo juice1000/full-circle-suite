@@ -27,7 +27,7 @@ export async function gptChatResponse(
   messageHistory?: any,
   user?: any
 ) {
-  console.log('\nCalling gptChatResponse\n');
+  // console.log('\nCalling gptChatResponse\n');
   const openaiClient: OpenAI = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;
@@ -71,7 +71,7 @@ export async function interpretStressLevel(
   console.log('\nCalling interpretStressLevel\n');
   const openaiClient = gptSetup();
 
-  const systemPrompt = `Provide a stress level evaluation for the user based on the given message. Use a number between -1 and 1, where -1 indicates high stress or sadness, and 1 indicates low stress or cheerfulness. Consider the user's emotional state in their most recent message as having a greater impact. The user's messages indicate their distress related to their crying child. Give a single number as your response.`;
+  const systemPrompt = `Provide a stress level evaluation for the user based on the given messages. Use a number between -1 and 1, where -1 indicates high stress or sadness, and 1 indicates low stress or cheerfulness. Consider the user's emotional state in their most recent message as having a greater impact. Give a single number as your response.`;
   const messages = [
     {
       role: 'system',
@@ -82,7 +82,7 @@ export async function interpretStressLevel(
   if (messageHistory) {
     appendMessageHistoryStressLevel(messageHistory, messages);
   }
-
+  //console.log(messages);
   const scoreCompletion = await executeGPTModel(messages, openaiClient, prompt);
 
   if (!isNaN(+scoreCompletion)) {
@@ -106,7 +106,7 @@ export async function gptExerciseResponse(
   user: any,
   exercise: any
 ) {
-  console.log('\nCalling gptExerciseResponse\n');
+  // console.log('\nCalling gptExerciseResponse\n');
   const openaiClient = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;

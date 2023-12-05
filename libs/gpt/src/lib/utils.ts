@@ -4,7 +4,7 @@
  * @returns user information
  */
 export function generateUserInfo(user: any): string {
-  console.log('\nCalling generateUserInfo\n');
+  // console.log('\nCalling generateUserInfo\n');
   const userInfo = [];
   if (user.firstname) {
     userInfo.push(`The name of the user is: ${user.firstname}.`);
@@ -50,7 +50,7 @@ export function generateUserInfo(user: any): string {
  * @param messages array that will be used for a new GPT prompt
  */
 export function appendMessageHistory(messageHistory: any, messages: any[]) {
-  console.log('\nCalling appendMessageHistory\n');
+  // console.log('\nCalling appendMessageHistory\n');
   messageHistory.forEach((message: any) => {
     const userMessage = {
       role: 'user',
@@ -69,7 +69,7 @@ export function appendMessageHistoryStressLevel(
   messageHistory: any,
   messages: any[]
 ) {
-  console.log('\nCalling appendMessageHistoryStressLevel\n');
+  // console.log('\nCalling appendMessageHistoryStressLevel\n');
   messageHistory.forEach((message: any) => {
     const userMessage = {
       role: 'user',

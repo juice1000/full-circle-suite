@@ -58,7 +58,7 @@ export async function createMessage(
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
-    gptModel: process.env.GPT_MODEL || '',
+    gptModel: process.env.GPT_MODEL3 || '',
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-messages',

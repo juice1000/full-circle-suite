@@ -1,18 +1,13 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
-import cors from 'cors';
 import { messageProcessor } from './controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import {
-  writeUser,
-  initializeDB,
-  createExercise,
-  getExercise,
-} from '@libs/dynamo-db';
-import { whatsAppVerify } from '@libs/whats-app';
+import { writeUser, initializeDB, createExercise } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
+import { whatsAppVerify } from '@libs/whats-app';
+
 // deleteTables();
 initializeDB();
 
@@ -29,12 +24,6 @@ const sessionMiddleware = session({
   saveUninitialized: true,
 });
 app.use(sessionMiddleware);
-
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
 
 // Accept JSON Request and Response
 app.use(express.json());
@@ -84,6 +73,7 @@ app.get('/create-user', async (req: Request, res: Response) => {
     exerciseMode: false,
     exerciseName: '',
     exerciseStep: 0,
+    exerciseLastParticipated: new Date(),
   };
 
   await writeUser(user);

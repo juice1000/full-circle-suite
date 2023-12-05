@@ -28,12 +28,14 @@ export const userSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
       AttributeName: 'id',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -48,12 +50,14 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
       AttributeName: 'id',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -65,15 +69,17 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
 export const selectedTrainingDataSchema: CreateTableCommandInput = {
   AttributeDefinitions: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -88,12 +94,14 @@ export const guidedExerciseSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
       AttributeName: 'id',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
