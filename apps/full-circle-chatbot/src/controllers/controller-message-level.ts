@@ -7,17 +7,12 @@ import {
 } from '@libs/dynamo-db';
 import { gptChatResponse } from '@libs/gpt';
 import { sendUserMessage } from '@libs/whats-app';
-import { Response } from 'express';
 import {
   controllerExerciseRoute,
   evaluateStressLevel,
 } from './controller-exercise-route';
 
-export async function controllerMessageLevel(
-  user: User,
-  messageText: string,
-  res: Response
-) {
+export async function controllerMessageLevel(user: User, messageText: string) {
   let messageHistory: Message[] = null;
   let gptResponse: string = '';
   // Retrieve chat history
@@ -31,7 +26,6 @@ export async function controllerMessageLevel(
     messageHistory[messageHistory.length - 1].created > lastMessageThreshold // Same message happened in the last 5min
   ) {
     console.error('Message has been previously sent to the server');
-    res.sendStatus(200);
   } else {
     // Check if user in exercise mode
     if (user.exerciseMode) {
@@ -56,7 +50,5 @@ export async function controllerMessageLevel(
     }
     // Update User in database
     writeUser(user);
-
-    res.sendStatus(200);
   }
 }

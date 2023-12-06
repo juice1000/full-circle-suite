@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
-import { messageProcessor } from './controller-whatsapp';
+import { messageProcessor } from './controllers/controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 

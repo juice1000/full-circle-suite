@@ -24,14 +24,13 @@ export function whatsAppVerify(req: Request, res: Response) {
  * Retrieves messages from WhatsApp and extracts the message. It will also send a response back to the webhook
  * @returns
  */
-export async function whatsAppRetreiveMessage(req: Request, res: Response) {
+export async function whatsAppRetreiveMessage(req: Request) {
   // console.log('\nCalling whatsAppRetreiveMessage\n');
   const body_param = req.body;
 
   if (!body_param) {
     // not from the messages webhook so dont process
-    console.log('got here');
-    res.sendStatus(400);
+    console.error('no message received');
     return null;
   } else {
     // TODO: needs to be reworked for more stability
