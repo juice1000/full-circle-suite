@@ -49,7 +49,6 @@ export async function messageProcessor(req: Request, res: Response) {
             redisData.messages
           );
           deleteKey(id);
-          console.log();
           controllerMessageLevel(user, redisData.messages);
         }
       }, 4000);

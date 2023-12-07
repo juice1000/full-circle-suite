@@ -93,10 +93,8 @@ export async function interpretStressLevel(
   } else {
     const re = new RegExp('(-*\\d\\.*\\d*)');
     const score = scoreCompletion.match(re);
-    console.log(scoreCompletion);
 
     if (score) {
-      console.log('score: ', score[0]);
       user.stressScore = score[0];
     }
   }
