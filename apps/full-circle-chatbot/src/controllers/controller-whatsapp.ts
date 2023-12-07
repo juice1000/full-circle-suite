@@ -3,8 +3,7 @@ import { sendUserMessage, whatsAppRetreiveMessage } from '@libs/whats-app';
 
 import { getUser } from '@libs/dynamo-db';
 import { controllerMessageLevel } from './controller-message-level';
-
-const debounceObj = {};
+import { deleteKey, findKey, writeKey } from '../io-redis';
 
 export async function messageProcessor(req: Request, res: Response) {
   // Extract whats app user information
@@ -28,29 +27,38 @@ export async function messageProcessor(req: Request, res: Response) {
     } else {
       // debouncing message input
       const id = user.id;
-      if (debounceObj[`${id}`]) {
-        debounceObj[`${id}`].text += `\n${messageText}`;
-        debounceObj[`${id}`].lastAdded = new Date();
+      let redisData = await findKey(id);
+
+      if (redisData) {
+        redisData.messages += `\n${messageText}`;
+        redisData.lastMessage = new Date();
       } else {
-        debounceObj[`${id}`] = { text: messageText, lastAdded: new Date() };
+        redisData = { messages: messageText, lastMessage: new Date() };
       }
-      const inter = setInterval(() => {
+
+      await writeKey(id, redisData);
+
+      setTimeout(async () => {
+        redisData = await findKey(id);
         if (
-          debounceObj[`${id}`].lastAdded <
-          new Date(new Date().getTime() - 3 * 1000)
+          redisData &&
+          redisData.lastMessage.getTime() < new Date().getTime() - 3 * 1000
         ) {
-          console.log('we can start!');
-          clearInterval(inter);
-          //controllerMessageLevel(user, messageText, res);
+          console.log(
+            `debouncing messages done, let's start!`,
+            redisData.messages
+          );
+          deleteKey(id);
+          console.log();
+          controllerMessageLevel(user, messageText);
         }
-        // console.log(debounceObj[`${id}`]);
-      }, 1000);
+      }, 3000);
     }
 
-    // Message received
+    // What's App message received
     res.sendStatus(200);
   } else {
-    // Message not received
+    // What's App message not received
     res.sendStatus(400);
   }
 }

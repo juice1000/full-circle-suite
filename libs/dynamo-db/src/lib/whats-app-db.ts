@@ -38,11 +38,11 @@ export async function getMessages(
 
       return messages;
     } else {
-      console.log('no message found');
+      console.log('no messages found');
       return null;
     }
   } catch (err) {
-    console.log('no message found');
+    console.log('no messages found');
     return null;
   }
 }

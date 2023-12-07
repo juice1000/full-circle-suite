@@ -28,6 +28,7 @@ export async function executeGPTModel(
 
     // console.log(completion.choices[0].message.content);
     if (completion.choices[0].message.content) {
+      console.log(completion.choices[0].message.content);
       return completion.choices[0].message.content;
     } else {
       return 'An unexpected error occured, the chatbot AI could not respond';

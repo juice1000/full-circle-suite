@@ -56,7 +56,7 @@ export async function evaluateStressLevel(
     new Date().getTime() - 14 * 24 * 60 * 60 * 1000
   );
   if (
-    user.stressScore < -0.5 &&
+    user.stressScore < -0.8 &&
     user.exerciseLastParticipated < datePreviousTwoWeeks
   ) {
     // Initiate stress exercise

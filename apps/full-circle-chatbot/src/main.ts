@@ -61,14 +61,14 @@ app.get('/create-user', async (req: Request, res: Response) => {
   console.log('create demo user');
   //const userInfo = req.body;
   const user = {
-    firstname: 'Julien',
-    lastname: 'Look',
+    firstname: 'Grace',
+    lastname: 'Zhu',
     birthdate: new Date('1996-04-25'),
-    phone: '4917643209870',
-    email: 'julienlook@gmx.de',
-    numberOfChildren: 1,
+    phone: '6583226020',
+    email: '',
+    numberOfChildren: 2,
     introduction:
-      'Julien is a father in maternal leave. He takes care of his son with little help from his wife, because she mostly works overseas and rarely comes home. His son is very anxious and often cries.',
+      'Grace is a mother and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. She has a 2-year-old son and a 5-year-old daughter. She speaks Singlish.',
     stressScore: 0,
     exerciseMode: false,
     exerciseName: '',

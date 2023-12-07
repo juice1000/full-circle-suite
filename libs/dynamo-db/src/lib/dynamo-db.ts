@@ -37,7 +37,12 @@ async function deleteTable(tableName: string) {
 
 export async function initializeDB() {
   if (!dbClient) {
-    dbClient = new DynamoDB({ region: process.env.AWS_REGION_EU_NORTH });
+    const config = {
+      region: process.env.AWS_REGION_EU_NORTH,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    };
+    dbClient = new DynamoDB(config);
   }
   try {
     const results = await dbClient.listTables({});

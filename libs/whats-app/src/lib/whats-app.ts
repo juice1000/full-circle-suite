@@ -63,7 +63,7 @@ export async function sendUserMessage(
     };
 
     const response = axios.post(
-      'https://graph.facebook.com/v17.0/189035427616900/messages',
+      `https://graph.facebook.com/v17.0/${process.env.WHATSAPP_NUMBER_ID}/messages`,
       messageBody,
       {
         headers: {
