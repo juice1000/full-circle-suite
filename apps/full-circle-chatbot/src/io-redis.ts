@@ -1,6 +1,13 @@
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL);
+//console.log('REDIS URL: ', process.env.REDIS_URL);
+const redis = new Redis(process.env.REDIS_URL, { family: 6 });
+
+redis.on('error', (err) => {
+  // We don't need to start the server if Redis connection failed
+  console.error('REDIS CONNECTION: FAILED\n', err);
+  process.exit(0);
+});
 
 interface redisUserData {
   messages: string;

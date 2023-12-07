@@ -4,7 +4,13 @@ import { messageProcessor } from './controllers/controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import { writeUser, initializeDB, createExercise } from '@libs/dynamo-db';
+import {
+  writeUser,
+  initializeDB,
+  createExercise,
+  getUser,
+  getExercise,
+} from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
 
@@ -75,8 +81,13 @@ app.get('/create-user', async (req: Request, res: Response) => {
     exerciseStep: 0,
     exerciseLastParticipated: new Date(),
   };
+  const existingUser = await getUser(user.phone);
+  if (!existingUser) {
+    await writeUser(user);
+  } else {
+    console.error('user already exists');
+  }
 
-  await writeUser(user);
   res.sendStatus(200);
 });
 
@@ -99,7 +110,12 @@ app.get('/create-exercise', async (req, res) => {
     `Now, regarding nighttime routines, let's explore evidence-based strategies tailored to both the baby's needs and yours.`,
     `There are professionals and evidence-based approaches available to assist you. Would you be open to exploring some options?`,
   ];
+  const existingExercise = await getExercise(name);
+  if (!existingExercise) {
+    await createExercise(name, steps, questions);
+  } else {
+    console.error('exercise already exists');
+  }
 
-  await createExercise(name, steps, questions);
   res.sendStatus(200);
 });

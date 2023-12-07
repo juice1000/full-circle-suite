@@ -74,7 +74,10 @@ export async function sendUserMessage(
     );
     return response;
   } catch (err) {
-    console.error(err);
+    console.error(
+      'Axios Send Error: Mostly this is related to the auth token not being correct'
+    );
+    //console.error(err);
     return;
   }
 }
