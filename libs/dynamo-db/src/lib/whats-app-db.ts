@@ -12,7 +12,7 @@ export async function getMessages(
     const params = {
       TableName: 'full-circle-messages',
       KeyConditionExpression: 'userId = :value',
-      ScanIndexForward: true,
+      ScanIndexForward: false,
       Limit: limit || 5,
       ExpressionAttributeValues: {
         ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
@@ -35,8 +35,8 @@ export async function getMessages(
         };
         messages.push(message);
       });
-
-      return messages;
+      // we need to reverse the order so our gpt model gets the latest message at last
+      return messages.reverse();
     } else {
       console.log('no messages found');
       return null;

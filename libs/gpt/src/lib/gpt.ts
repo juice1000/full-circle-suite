@@ -82,6 +82,8 @@ export async function interpretStressLevel(
   if (messageHistory) {
     appendMessageHistoryStressLevel(messageHistory, messages);
   }
+  // console.log('messages we consider for stress level evaluation: ', messages);
+
   //console.log(messages);
   const scoreCompletion = await executeGPTModel(messages, openaiClient, prompt);
 

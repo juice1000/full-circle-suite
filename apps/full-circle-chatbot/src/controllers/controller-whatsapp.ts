@@ -42,7 +42,7 @@ export async function messageProcessor(req: Request, res: Response) {
         redisData = await findKey(id);
         if (
           redisData &&
-          redisData.lastMessage.getTime() < new Date().getTime() - 3 * 1000
+          redisData.lastMessage.getTime() < new Date().getTime() - 3999
         ) {
           console.log(
             `debouncing messages done, let's start!`,
@@ -50,9 +50,9 @@ export async function messageProcessor(req: Request, res: Response) {
           );
           deleteKey(id);
           console.log();
-          controllerMessageLevel(user, messageText);
+          controllerMessageLevel(user, redisData.messages);
         }
-      }, 3000);
+      }, 4000);
     }
 
     // What's App message received
