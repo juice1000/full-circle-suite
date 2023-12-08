@@ -24,6 +24,18 @@ export async function messageProcessor(req: Request, res: Response) {
         phone,
         'Hello, you seem to be not registered with our service. Please sign up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.'
       );
+    } else if (
+      user.subscriptionEndDate &&
+      user.subscriptionEndDate < new Date()
+    ) {
+      // User subscription has expired
+      // Send message to this phone number to refresh subscription
+
+      console.log('subscription ended for: ', user.id);
+      sendUserMessage(
+        phone,
+        `Hello, your subscription seems to have expired. Please renew your subscription up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.`
+      );
     } else {
       // debouncing message input
       const id = user.id;

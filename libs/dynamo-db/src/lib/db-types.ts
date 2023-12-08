@@ -13,7 +13,9 @@ export interface User {
   phone: string;
   stressScore: number;
   exerciseMode: boolean;
-  firstname?: string;
+  subscriptionStartDate: Date;
+  subscriptionEndDate: Date | null;
+  firstname: string;
   lastname?: string;
   email?: string;
   birthdate?: Date;

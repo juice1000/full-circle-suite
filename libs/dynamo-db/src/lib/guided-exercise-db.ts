@@ -42,7 +42,7 @@ export async function getExercise(
   }
 }
 
-export async function createExercise(
+export async function writeExercise(
   name: string,
   steps: number,
   questions: string[]
@@ -73,4 +73,18 @@ export async function createExercise(
   console.log('created new exercise');
 
   return exercise;
+}
+
+export async function createExercise(
+  name: string,
+  steps: number,
+  questions: string[]
+) {
+  const existingUser = await getExercise(name);
+  if (!existingUser) {
+    writeExercise(name, steps, questions);
+  } else {
+    // TODO: report feedback to signing up user that phone number has already been taken
+    console.error('Exercise already exists');
+  }
 }

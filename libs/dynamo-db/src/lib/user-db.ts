@@ -36,6 +36,10 @@ export async function getUser(phone: string): Promise<User | null> {
         exerciseLastParticipated: new Date(
           Number(item.exerciseLastParticipated?.N)
         ),
+        subscriptionStartDate: new Date(Number(item.subscriptionStartDate?.N)),
+        subscriptionEndDate: item.subscriptionEndDate?.NULL
+          ? null
+          : new Date(Number(item.subscriptionEndDate?.N)),
       };
       return user;
     } else {
@@ -46,29 +50,6 @@ export async function getUser(phone: string): Promise<User | null> {
     console.log('error retrieving user');
     return null;
   }
-}
-
-export async function createUser(phone: string) {
-  const user: User = {
-    id: uuidv4(), // generate random UUID
-    created: new Date(),
-    phone: phone,
-    stressScore: 0,
-    exerciseMode: false,
-  };
-  const putCommand = new PutItemCommand({
-    TableName: 'full-circle-users',
-    Item: {
-      id: { S: user.id },
-      created: { N: `${user.created.getTime()}` },
-      phone: { S: `${phone}` },
-      stressScore: { N: '0' },
-    },
-  });
-  await dbClient.send(putCommand);
-  console.log('created new user');
-
-  return user;
 }
 
 export async function writeUser(userInfo: User | any) {
@@ -88,6 +69,8 @@ export async function writeUser(userInfo: User | any) {
     exerciseName: userInfo.exerciseName,
     exerciseStep: userInfo.exerciseStep,
     exerciseLastParticipated: userInfo.exerciseLastParticipated,
+    subscriptionStartDate: userInfo.subscriptionStartDate,
+    subscriptionEndDate: userInfo.subscriptionEndDate,
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-users',
@@ -108,10 +91,26 @@ export async function writeUser(userInfo: User | any) {
       exerciseLastParticipated: {
         N: `${user.exerciseLastParticipated.getTime()}`,
       },
+      subscriptionStartDate: { N: `${user.subscriptionStartDate.getTime()}` },
+      subscriptionEndDate: user.subscriptionEndDate
+        ? {
+            N: `${user.subscriptionEndDate.getTime()}`,
+          }
+        : { NULL: true },
     },
   });
   await dbClient.send(putCommand);
   console.log('written user');
 
   return user;
+}
+
+export async function createUser(userInfo: any) {
+  const existingUser = await getUser(userInfo.phone);
+  if (!existingUser) {
+    writeUser(userInfo);
+  } else {
+    // TODO: report feedback to signing up user that phone number has already been taken
+    console.error('User already exists');
+  }
 }

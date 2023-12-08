@@ -5,11 +5,10 @@ import { messageProcessor } from './controllers/controller-whatsapp';
 // ***************************************** NX LIBRARIES ***************************************
 
 import {
-  writeUser,
   initializeDB,
   createExercise,
-  getUser,
   getExercise,
+  createUser,
 } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
@@ -67,26 +66,24 @@ app.get('/create-user', async (req: Request, res: Response) => {
   console.log('create demo user');
   //const userInfo = req.body;
   const user = {
-    firstname: 'Grace',
-    lastname: 'Zhu',
+    firstname: 'Julien',
+    lastname: 'Look',
     birthdate: new Date('1996-04-25'),
-    phone: '6583226020',
+    phone: '4917643209870',
     email: '',
     numberOfChildren: 2,
     introduction:
-      'Grace is a mother and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. She has a 2-year-old son and a 5-year-old daughter. She speaks Singlish.',
+      'Julien is a father and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. He has a 2-year-old son and a 5-year-old daughter. He speaks Singlish.',
     stressScore: 0,
     exerciseMode: false,
     exerciseName: '',
     exerciseStep: 0,
     exerciseLastParticipated: new Date(),
+    subscriptionStartDate: new Date(),
+    subscriptionEndDate: null,
   };
-  const existingUser = await getUser(user.phone);
-  if (!existingUser) {
-    await writeUser(user);
-  } else {
-    console.error('user already exists');
-  }
+
+  await createUser(user);
 
   res.sendStatus(200);
 });
