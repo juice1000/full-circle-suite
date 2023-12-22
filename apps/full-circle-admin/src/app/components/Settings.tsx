@@ -1,8 +1,8 @@
-const Dashboard = () => {
+const Settings = () => {
   return (
     <div>
       <main>
-        <h1 className="text-6xl font-bold">Welcome To Full Circle Admin</h1>
+        <h1 className="text-6xl font-bold">Settings</h1>
 
         <div className=""></div>
         {/* Add more content and components as needed */}
@@ -11,4 +11,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Settings;

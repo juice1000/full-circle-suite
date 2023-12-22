@@ -6,6 +6,8 @@ import SidebarNavigation from './components/SidebarNavigation';
 import Dashboard from './components/Dashboard';
 import PageNotFound from './components/PageNotFound';
 import { useState } from 'react';
+import ControlPanel from './components/ControlPanel';
+import Settings from './components/Settings';
 
 function RenderItem({
   loggedIn,
@@ -14,17 +16,17 @@ function RenderItem({
   loggedIn: boolean;
   loginStatusResolved: boolean;
 }) {
-  const handleSignOut = () => {
-    console.log('Sign Out');
-  };
   return (
     <Router>
       <div className="basis-1/6">
-        <SidebarNavigation onSignOut={handleSignOut} />
+        <SidebarNavigation />
       </div>
       <div className="basis-5/6 overflow-scroll p-14">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/controls" element={<ControlPanel />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
