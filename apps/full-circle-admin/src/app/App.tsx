@@ -1,20 +1,64 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './App.module.css';
 
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes, Link, BrowserRouter as Router } from 'react-router-dom';
+import SidebarNavigation from './components/SidebarNavigation';
+import Dashboard from './components/Dashboard';
+import PageNotFound from './components/PageNotFound';
+import { useState } from 'react';
 
-export function App() {
+function RenderItem({
+  loggedIn,
+  loginStatusResolved,
+}: {
+  loggedIn: boolean;
+  loginStatusResolved: boolean;
+}) {
+  const handleSignOut = () => {
+    console.log('Sign Out');
+  };
   return (
-    <div>
-      <h1>
-        <span> Hello there, </span>
-        Welcome full-circle-admin 👋
-      </h1>
-    </div>
+    <Router>
+      <div className="basis-1/6">
+        <SidebarNavigation onSignOut={handleSignOut} />
+      </div>
+      <div className="basis-5/6 overflow-scroll p-14">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
-export default App;
+export default function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loginStatusResolved, setLoginStatus] = useState(false);
+
+  // useEffect(() => {
+  //   onAuthStateChanged(auth, async (_user) => {
+  //     if (_user) {
+  //       setLoggedIn(true);
+  //       setLoginStatus(true);
+  //       console.log('user is logged in!');
+  //     } else {
+  //       setLoggedIn(false);
+  //       setLoginStatus(true);
+  //       console.log('user is not logged in');
+  //     }
+  //   });
+  // }, []);
+
+  return (
+    <div className="flex flex-row h-screen">
+      <RenderItem
+        loggedIn={loggedIn}
+        loginStatusResolved={loginStatusResolved}
+      />
+    </div>
+  );
+}
 
 if (import.meta.vitest) {
   // add tests related to your file here
@@ -29,16 +73,16 @@ if (import.meta.vitest) {
 
   it('should render successfully', () => {
     const { baseElement } = render(
-      <BrowserRouter>
+      <Router>
         <App />
-      </BrowserRouter>
+      </Router>
     );
     expect(baseElement).toBeTruthy();
   });
 
   it('should have a greeting as the title', () => {
     const { getByText } = render(
-      <BrowserRouter>
+      <Router>
         <App />
         {/* START: routes */}
         {/* These routes and navigation have been generated for you */}
@@ -76,7 +120,7 @@ if (import.meta.vitest) {
           />
         </Routes>
         {/* END: routes */}
-      </BrowserRouter>
+      </Router>
     );
     expect(getByText(/Welcome full-circle-admin/gi)).toBeTruthy();
   });
