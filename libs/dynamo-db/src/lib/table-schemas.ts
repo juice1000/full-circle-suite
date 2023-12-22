@@ -1,52 +1,19 @@
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb';
 
-export interface Message {
-  id: string;
-  userId: string;
-  created: Date;
-  userMessage: string;
-  gptResponse: string;
-}
-
-export interface User {
-  id: string;
-  created: Date;
-  phone: string;
-  stressScore: number;
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  birthdate?: Date;
-  numberOfChildren?: number;
-  introduction?: string;
-}
-
-export interface GPTSystemPrompts {
-  id: string;
-  created: Date;
-  prompt: string;
-}
-
-export interface SelectedTrainingData {
-  id: string;
-  userId: string;
-  created: Date;
-  userMessage: string;
-  gptResponse: string;
-}
-
 export const messageSchema: CreateTableCommandInput = {
   AttributeDefinitions: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -61,12 +28,14 @@ export const userSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
       AttributeName: 'id',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -81,12 +50,14 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
       AttributeName: 'id',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
@@ -98,19 +69,43 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
 export const selectedTrainingDataSchema: CreateTableCommandInput = {
   AttributeDefinitions: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       AttributeType: 'S',
     },
+    { AttributeName: 'created', AttributeType: 'N' },
   ],
   KeySchema: [
     {
-      AttributeName: 'id',
+      AttributeName: 'userId',
       KeyType: 'HASH',
     },
+    { AttributeName: 'created', KeyType: 'RANGE' },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 5,
     WriteCapacityUnits: 5,
   },
   TableName: 'full-circle-selected-training-data',
+};
+
+export const guidedExerciseSchema: CreateTableCommandInput = {
+  AttributeDefinitions: [
+    {
+      AttributeName: 'id',
+      AttributeType: 'S',
+    },
+    { AttributeName: 'created', AttributeType: 'N' },
+  ],
+  KeySchema: [
+    {
+      AttributeName: 'id',
+      KeyType: 'HASH',
+    },
+    { AttributeName: 'created', KeyType: 'RANGE' },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
+  },
+  TableName: 'full-circle-guided-exercises',
 };

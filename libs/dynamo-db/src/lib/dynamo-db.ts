@@ -9,6 +9,7 @@ import {
   userSchema,
   gptSystemPromptSchema,
   selectedTrainingDataSchema,
+  guidedExerciseSchema,
 } from './table-schemas';
 
 let dbClient: DynamoDB;
@@ -36,7 +37,12 @@ async function deleteTable(tableName: string) {
 
 export async function initializeDB() {
   if (!dbClient) {
-    dbClient = new DynamoDB({ region: process.env.AWS_REGION_EU_NORTH });
+    const config = {
+      region: process.env.AWS_REGION_EU_NORTH,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    };
+    dbClient = new DynamoDB(config);
   }
   try {
     const results = await dbClient.listTables({});
@@ -60,6 +66,13 @@ export async function initializeDB() {
           dbClient,
           selectedTrainingDataSchema,
           'full-circle-selected-training-data'
+        );
+      }
+      if (!results.TableNames.includes('full-circle-guided-exercises')) {
+        await createTable(
+          dbClient,
+          guidedExerciseSchema,
+          'full-circle-guided-exercises'
         );
       }
     }
@@ -89,6 +102,9 @@ export async function deleteTables() {
       }
       if (results.TableNames.includes('full-circle-selected-training-data')) {
         await deleteTable('full-circle-selected-training-data');
+      }
+      if (results.TableNames.includes('full-circle-guided-exercises')) {
+        await deleteTable('full-circle-guided-exercises');
       }
     }
   } catch (err) {

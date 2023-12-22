@@ -1,20 +1,24 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
-import cors from 'cors';
-import { whatsAppVerify, helloWhatsApp } from '@libs/whats-app';
-import { whatsAppWebhook } from './controller';
+import { messageProcessor } from './controllers/controller-whatsapp';
 
 // ***************************************** NX LIBRARIES ***************************************
 
-import { writeUser, initializeDB } from '@libs/dynamo-db';
+import {
+  initializeDB,
+  createExercise,
+  getExercise,
+  createUser,
+} from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
-// import { gptChatResponse } from '@libs/gpt';
+import { whatsAppVerify } from '@libs/whats-app';
+
+// deleteTables();
+initializeDB();
 
 // ************************************************************************************************
 // ************************************************************************************************
 // ***************************************** SERVER SETUP *****************************************
-// deleteTables();
-initializeDB();
 
 const app = express();
 
@@ -26,21 +30,10 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
-
 // Accept JSON Request and Response
 app.use(express.json());
 app.get('/', (req, res) => {
   res.send({ message: 'Hello from Server!' });
-});
-
-app.get('/test', (req, res) => {
-  const message = helloWhatsApp();
-  res.send({ message: message });
 });
 
 const host = process.env.HOST ?? 'localhost';
@@ -59,27 +52,67 @@ app.get('/whatsapp-webhook', (req: Request, res: Response) => {
 });
 app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
   // This webhook listens to incoming messages from the user
-  await whatsAppWebhook(req, res);
+  try {
+    await messageProcessor(req, res);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(400);
+  }
 });
 
 // TODO: this function is still in the making and only for demo purposes
 app.get('/create-user', async (req: Request, res: Response) => {
   // TODO: create user profile after signup
   console.log('create demo user');
-
-  const userInfo = req.body;
+  //const userInfo = req.body;
   const user = {
     firstname: 'Julien',
     lastname: 'Look',
     birthdate: new Date('1996-04-25'),
     phone: '4917643209870',
-    email: 'julienlook@gmx.de',
-    numberOfChildren: 1,
+    email: '',
+    numberOfChildren: 2,
     introduction:
-      'Julien is a father in maternal leave. He takes care of his son with little help from his wife, because she mostly works overseas and rarely comes home. His son is very anxious and often cries.',
+      'Julien is a father and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. He has a 2-year-old son and a 5-year-old daughter. He speaks Singlish.',
     stressScore: 0,
+    exerciseMode: false,
+    exerciseName: '',
+    exerciseStep: 0,
+    exerciseLastParticipated: new Date(),
+    subscriptionStartDate: new Date(),
+    subscriptionEndDate: null,
   };
 
-  await writeUser(user);
+  await createUser(user);
+
+  res.sendStatus(200);
+});
+
+app.get('/create-exercise', async (req, res) => {
+  // TODO: create exercises through admin panel
+  console.log('create demo exercise');
+  const name = 'mental-distress';
+  const steps = 12;
+  const questions = [
+    `I understand you've been facing tough challenges recently. Can you share more about what specifically has been happening?`,
+    `Before we explore strategies, can you provide more details? Are there specific patterns or triggers you've noticed?`,
+    `Regarding hunger, how are the baby's feeding patterns during the day?`,
+    `Have you implemented any bedtime routine so far?`,
+    `Now, let's talk about your own sleep. How has it been for you during these challenging nights?`,
+    `Have you considered adjusting your sleeping space?`,
+    `Now, let's explore your emotional well-being. Have you noticed any changes in your mood or interest in activities you used to enjoy?`,
+    `Now, regarding your energy level, how has it been lately?`,
+    `Now, let me ask you two important questions: During the past month, have you often been bothered by feeling down, depressed, or hopeless?`,
+    `Another question: During the past month, have you often been bothered by having little interest or pleasure in doing things you normally enjoyed?`,
+    `Now, regarding nighttime routines, let's explore evidence-based strategies tailored to both the baby's needs and yours.`,
+    `There are professionals and evidence-based approaches available to assist you. Would you be open to exploring some options?`,
+  ];
+  const existingExercise = await getExercise(name);
+  if (!existingExercise) {
+    await createExercise(name, steps, questions);
+  } else {
+    console.error('exercise already exists');
+  }
+
   res.sendStatus(200);
 });

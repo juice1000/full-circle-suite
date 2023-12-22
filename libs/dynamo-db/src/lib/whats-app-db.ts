@@ -2,42 +2,47 @@ import { dbClient } from './dynamo-db';
 import { PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Message } from './table-schemas';
+import { Message } from './db-types';
 
-export async function getMessages(userId: string): Promise<Message[] | null> {
+export async function getMessages(
+  userId: string,
+  limit?: number
+): Promise<Message[] | null> {
   try {
     const params = {
       TableName: 'full-circle-messages',
-      FilterExpression: 'userId = :value',
+      KeyConditionExpression: 'userId = :value',
+      ScanIndexForward: false,
+      Limit: limit || 5,
       ExpressionAttributeValues: {
         ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-      Limit: 5,
     };
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await dbClient.query(params);
 
     if (response.Items && response.Items.length > 0) {
       const items = response.Items;
       const messages: Message[] = [];
       items.forEach((item) => {
         const message: Message = {
-          id: item.id.S || '',
-          created: new Date(Number(item.created.N)) || new Date(),
+          id: item.id.S,
+          created: new Date(Number(item.created.N)),
           userId: userId,
-          userMessage: item.userMessage.S || '',
-          gptResponse: item.gptResponse.S || '',
+          userMessage: item.userMessage.S,
+          gptResponse: item.gptResponse.S,
+          gptModel: item.gptModel.S,
         };
         messages.push(message);
       });
-
-      return messages;
+      // we need to reverse the order so our gpt model gets the latest message at last
+      return messages.reverse();
     } else {
-      console.log('no message found');
+      console.log('no messages found');
       return null;
     }
   } catch (err) {
-    console.log('no message found');
+    console.log('no messages found');
     return null;
   }
 }
@@ -53,6 +58,7 @@ export async function createMessage(
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
+    gptModel: process.env.GPT_MODEL3 || '',
   };
   const putCommand = new PutItemCommand({
     TableName: 'full-circle-messages',
@@ -62,6 +68,7 @@ export async function createMessage(
       userId: { S: `${message.userId}` },
       userMessage: { S: message.userMessage },
       gptResponse: { S: message.gptResponse },
+      gptModel: { S: message.gptModel },
     },
   });
   await dbClient.send(putCommand);
