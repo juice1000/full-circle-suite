@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
   UsersIcon,
@@ -18,13 +18,9 @@ const navigation = [
   },
 ];
 
-const SidebarNavigation = () => {
+const SidebarNavigation = (props: any) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  function handleSignOut() {
-    console.log('signout');
-    navigate('/login');
-  }
+
   return (
     <div className="flex">
       <nav className="w-64 h-screen bg-primary-dark pl-8 py-14">
@@ -63,7 +59,7 @@ const SidebarNavigation = () => {
           ))}
         </ul>
         <button
-          onClick={handleSignOut}
+          onClick={() => props.signOut()}
           className="mt-12 text-black hover:text-neutral-500 group flex gap-x-3 rounded-md mr-8 font-semibold"
         >
           <ArrowDownIcon
