@@ -26,10 +26,11 @@ export interface User {
   exerciseLastParticipated?: Date;
 }
 
-export interface GPTSystemPrompts {
+export interface GPTSystemPrompt {
   id: string;
   created: Date;
   prompt: string;
+  current: boolean;
 }
 
 export interface SelectedTrainingData {

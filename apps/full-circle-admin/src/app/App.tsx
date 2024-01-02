@@ -14,15 +14,45 @@ import { Authenticator, ThemeProvider } from '@aws-amplify/ui-react';
 import { AuthStyle } from './AuthUI';
 import '@aws-amplify/ui-react/styles.css';
 import config from '../amplifyconfiguration.json';
+// import { dbClient } from '@libs/dynamo-db';
+import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
+// import * as AWS from 'aws-sdk'
+// import { DynamoDB } from '@aws-sdk/client-dynamodb';
+
+const dbClient = new DynamoDBClient({ region: 'eu-north-1' });
+
+// const docClient = new AWS.DynamoDB.DocumentClient(configi);
+// console.log(docClient);
+(async function () {
+  // const e = await dbClient.listTables({});
+  // console.log(e);
+  const params = new ScanCommand({
+    TableName: 'full-circle-users',
+    FilterExpression: 'phone = :value',
+    ExpressionAttributeValues: {
+      ':value': { S: '6583226020' }, // Use the appropriate data type (S for String, N for Number, etc.)
+    },
+  });
+  dbClient.send(params, function (err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+    }
+  });
+})();
 
 Amplify.configure(config);
 
 function RenderItem() {
   return (
     <ThemeProvider theme={AuthStyle()}>
-      <Authenticator hideSignUp={true} className="w-screen h-full">
+      <Authenticator
+        hideSignUp={true}
+        className="w-screen h-full bg-primary-light"
+      >
         {({ signOut }) => (
-          <div className="flex">
+          <div className="flex w-screen">
             <Router>
               <div className="basis-1/6">
                 <SidebarNavigation signOut={signOut} />
@@ -30,7 +60,7 @@ function RenderItem() {
               <div className="basis-5/6 overflow-scroll p-14">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/analytics" element={<Dashboard />} />
                   <Route path="/controls" element={<ControlPanel />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<PageNotFound />} />

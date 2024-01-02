@@ -1,5 +1,5 @@
 import { dbClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GuidedExercise } from './db-types';
@@ -8,17 +8,17 @@ export async function getExercise(
   name: string
 ): Promise<GuidedExercise | null> {
   try {
-    const params = {
+    const params = new ScanCommand({
       TableName: 'full-circle-guided-exercises',
       FilterExpression: 'exerciseName = :value',
       ExpressionAttributeValues: {
         ':value': { S: name },
       },
       Limit: 1,
-    };
+    });
 
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await dbClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];

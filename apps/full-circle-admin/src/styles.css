@@ -5,3 +5,15 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .btn {
+    @apply w-32 h-12 rounded-lg font-bold bg-primary-darker hover:bg-primary-dark active:bg-primary-light;
+  }
+}
+
+@layer components {
+  .input-box {
+    @apply w-full rounded-md border-0 py-2.5 px-4 pl-3 pr-12 shadow-sm text-gray-900  sm:text-sm sm:leading-6 bg-gray-200;
+  }
+}

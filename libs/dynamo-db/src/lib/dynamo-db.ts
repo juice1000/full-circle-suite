@@ -1,8 +1,9 @@
 import {
-  DynamoDB,
+  DynamoDBClient,
   CreateTableCommand,
   CreateTableCommandInput,
   DeleteTableCommand,
+  ListTablesCommand,
 } from '@aws-sdk/client-dynamodb';
 import {
   messageSchema,
@@ -12,9 +13,9 @@ import {
   guidedExerciseSchema,
 } from './table-schemas';
 
-let dbClient: DynamoDB;
+let dbClient: DynamoDBClient;
 async function createTable(
-  dbClient: DynamoDB,
+  dbClient: DynamoDBClient,
   input: CreateTableCommandInput,
   name: string
 ) {
@@ -38,14 +39,21 @@ async function deleteTable(tableName: string) {
 export async function initializeDB() {
   if (!dbClient) {
     const config = {
-      region: process.env.AWS_REGION_EU_NORTH,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      //@ts-expect-error dunno why this happens
+      region: import.meta.env.VITE_AWS_REGION_EU_NORTH,
+      //@ts-expect-error dunno why this happens
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+      //@ts-expect-error dunno why this happens
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
     };
-    dbClient = new DynamoDB(config);
+
+    dbClient = new DynamoDBClient(config);
+    console.log(dbClient);
   }
   try {
-    const results = await dbClient.listTables({});
+    const command = new ListTablesCommand({});
+    const results = await dbClient.send(command);
+
     //console.log('available tables in DynamoDB:\n', results.TableNames);
     if (results.TableNames) {
       if (!results.TableNames.includes('full-circle-messages')) {
@@ -86,9 +94,12 @@ export async function initializeDB() {
 export async function deleteTables() {
   try {
     if (!dbClient) {
-      dbClient = new DynamoDB({ region: process.env.AWS_REGION_EU_NORTH });
+      dbClient = new DynamoDBClient({
+        region: process.env.AWS_REGION_EU_NORTH,
+      });
     }
-    const results = await dbClient.listTables({});
+    const command = new ListTablesCommand({});
+    const results = await dbClient.send(command);
     //console.log('available tables in DynamoDB:\n', results.TableNames);
     if (results.TableNames) {
       if (results.TableNames.includes('full-circle-messages')) {

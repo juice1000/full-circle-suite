@@ -13,7 +13,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: { light: '#fae6c8', dark: '#fcd497' },
+        primary: { light: '#fae6c8', dark: '#fcd497', darker: '#fcc26a' },
       },
     },
   },

@@ -1,5 +1,5 @@
 import { dbClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Message } from './db-types';
@@ -9,7 +9,7 @@ export async function getMessages(
   limit?: number
 ): Promise<Message[] | null> {
   try {
-    const params = {
+    const params = new QueryCommand({
       TableName: 'full-circle-messages',
       KeyConditionExpression: 'userId = :value',
       ScanIndexForward: false,
@@ -17,9 +17,9 @@ export async function getMessages(
       ExpressionAttributeValues: {
         ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-    };
+    });
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.query(params);
+    const response = await dbClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const items = response.Items;

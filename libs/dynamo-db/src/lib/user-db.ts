@@ -1,20 +1,20 @@
 import { dbClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { User } from './db-types';
 
 export async function getUser(phone: string): Promise<User | null> {
   try {
-    const params = {
+    const params = new ScanCommand({
       TableName: 'full-circle-users',
       FilterExpression: 'phone = :value',
       ExpressionAttributeValues: {
         ':value': { S: phone }, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-    };
+    });
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await dbClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
@@ -47,7 +47,7 @@ export async function getUser(phone: string): Promise<User | null> {
       return null;
     }
   } catch (err) {
-    console.log('error retrieving user');
+    console.log('error retrieving user', err);
     return null;
   }
 }
