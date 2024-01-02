@@ -1,4 +1,4 @@
-import { dbClient } from './dynamo-db';
+import { ddbDocClient, dbClient } from './dynamo-db';
 import {
   DynamoDBDocumentClient,
   UpdateCommand,
@@ -82,7 +82,7 @@ export async function getSystemPrompt(
 }
 
 export async function setCurrentPrompt(id: string) {
-  const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
+  // const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
   const command = new UpdateCommand({
     TableName: 'full-circle-gpt-system-prompts',
     Key: {
@@ -98,7 +98,7 @@ export async function setCurrentPrompt(id: string) {
   console.log(response);
 }
 export async function unsetCurrentPrompt() {
-  const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
+  // const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
   const currentPrompt = await getSystemPrompt(true);
   if (currentPrompt) {
     const command = new UpdateCommand({

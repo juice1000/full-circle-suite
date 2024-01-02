@@ -14,7 +14,7 @@ import {
 import { whatsAppVerify } from '@libs/whats-app';
 
 // deleteTables();
-initializeDB();
+initializeDB(process.env.AWS_REGION_EU_NORTH);
 
 // ************************************************************************************************
 // ************************************************************************************************

@@ -5,6 +5,7 @@ import {
   DeleteTableCommand,
   ListTablesCommand,
 } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import {
   messageSchema,
   userSchema,
@@ -14,6 +15,7 @@ import {
 } from './table-schemas';
 
 let dbClient: DynamoDBClient;
+let ddbDocClient: DynamoDBDocumentClient;
 async function createTable(
   dbClient: DynamoDBClient,
   input: CreateTableCommandInput,
@@ -36,19 +38,15 @@ async function deleteTable(tableName: string) {
   console.log('successfully deleted: ', tableName);
 }
 
-export async function initializeDB() {
+export async function initializeDB(region: string) {
   if (!dbClient) {
     const config = {
-      //@ts-expect-error dunno why this happens
-      region: import.meta.env.VITE_AWS_REGION_EU_NORTH,
-      //@ts-expect-error dunno why this happens
-      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-      //@ts-expect-error dunno why this happens
-      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+      region: region,
     };
 
     dbClient = new DynamoDBClient(config);
-    console.log(dbClient);
+    ddbDocClient = DynamoDBDocumentClient.from(dbClient);
+    // console.log(dbClient);
   }
   try {
     const command = new ListTablesCommand({});
@@ -123,4 +121,4 @@ export async function deleteTables() {
   }
 }
 
-export { dbClient };
+export { dbClient, ddbDocClient };

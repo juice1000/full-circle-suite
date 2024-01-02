@@ -1,46 +1,48 @@
-import { dbClient } from './dynamo-db';
-import { PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { dbClient, ddbDocClient } from './dynamo-db';
+import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { User } from './db-types';
 
+const tableName = 'full-circle-users';
 export async function getUser(phone: string): Promise<User | null> {
   try {
     const params = new ScanCommand({
-      TableName: 'full-circle-users',
+      TableName: tableName,
       FilterExpression: 'phone = :value',
       ExpressionAttributeValues: {
-        ':value': { S: phone }, // Use the appropriate data type (S for String, N for Number, etc.)
+        ':value': phone, // Use the appropriate data type (S for String, N for Number, etc.)
       },
     });
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.send(params);
+    const response = await ddbDocClient.send(params);
+    console.log(response);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
+      // console.log(item);
 
       const user: User = {
-        id: item.id.S,
-        created: new Date(Number(item.created.N)),
-        firstname: item.firstname?.S,
-        lastname: item.lastname?.S,
-        birthdate: new Date(Number(item.birthdate?.N)),
-        phone: item.phone.S,
-        stressScore: Number(item.stressScore.N),
-        email: item.email?.S,
-        numberOfChildren: Number(item.numberOfChildren?.N),
-        introduction: item.introduction?.S,
-        exerciseMode: item.exerciseMode.BOOL,
-        exerciseName: item.exerciseName?.S,
-        exerciseStep: Number(item.exerciseStep?.N),
-        exerciseLastParticipated: new Date(
-          Number(item.exerciseLastParticipated?.N)
-        ),
-        subscriptionStartDate: new Date(Number(item.subscriptionStartDate?.N)),
-        subscriptionEndDate: item.subscriptionEndDate?.NULL
-          ? null
-          : new Date(Number(item.subscriptionEndDate?.N)),
+        id: item.id,
+        created: new Date(item.created),
+        firstname: item.firstname,
+        lastname: item.lastname,
+        birthdate: new Date(item.birthdate),
+        phone: item.phone,
+        stressScore: item.stressScore,
+        email: item.email,
+        numberOfChildren: item.numberOfChildren,
+        introduction: item.introduction,
+        exerciseMode: item.exerciseMode,
+        exerciseName: item.exerciseName,
+        exerciseStep: item.exerciseStep,
+        exerciseLastParticipated: new Date(item.exerciseLastParticipated),
+        subscriptionStartDate: new Date(item.subscriptionStartDate),
+        subscriptionEndDate: new Date(item.subscriptionEndDate),
       };
+      // console.log(user);
+
       return user;
     } else {
       console.log('no user found');
@@ -73,7 +75,7 @@ export async function writeUser(userInfo: User | any) {
     subscriptionEndDate: userInfo.subscriptionEndDate,
   };
   const putCommand = new PutItemCommand({
-    TableName: 'full-circle-users',
+    TableName: tableName,
     Item: {
       id: { S: user.id },
       created: { N: `${user.created.getTime()}` },

@@ -8,7 +8,7 @@ import './styles.css';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-// initializeDB();
+// initializeDB(import.meta.env.VITE_AWS_REGION_EU_NORTH);
 root.render(
   <StrictMode>
     <App />
