@@ -8,7 +8,7 @@ import {
 import { classNames } from '../../utls';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
+  { name: 'Analytics', href: '/analytics', icon: HomeIcon, current: true },
   { name: 'Control Panel', href: '/controls', icon: UsersIcon, current: false },
   {
     name: 'Settings',
