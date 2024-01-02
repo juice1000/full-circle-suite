@@ -39,14 +39,14 @@ export async function initializeDB() {
   if (!dbClient) {
     const config = {
       region: process.env.AWS_REGION_EU_NORTH,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     };
     dbClient = new DynamoDB(config);
   }
   try {
     const results = await dbClient.listTables({});
-    //console.log('available tables in DynamoDB:\n', results.TableNames);
+    // console.log('available tables in DynamoDB:\n', results.TableNames);
     if (results.TableNames) {
       if (!results.TableNames.includes('full-circle-messages')) {
         await createTable(dbClient, messageSchema, 'full-circle-messages');
