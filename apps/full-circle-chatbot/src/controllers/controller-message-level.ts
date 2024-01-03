@@ -45,8 +45,13 @@ export async function controllerMessageLevel(user: User, messageText: string) {
     sendUserMessage(user.phone, gptResponse);
 
     if (!user.exerciseMode) {
-      // TODO: run this in timely intervals, we don't need to evaluate stress level with every message
-      await evaluateStressLevel(user, messageText, messageHistory);
+      // run this in timely intervals, we don't need to evaluate stress level with every message
+      const oneMonthThreshold = new Date(
+        new Date().getTime() - 30 * 24 * 3600 * 1000
+      );
+      if (oneMonthThreshold > user.exerciseLastParticipated) {
+        await evaluateStressLevel(user, messageText, messageHistory);
+      }
     }
     // Update User in database
     writeUser(user);
