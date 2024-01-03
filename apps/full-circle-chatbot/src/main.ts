@@ -86,7 +86,6 @@ app.get('/create-user', async (req: Request, res: Response) => {
     subscriptionStartDate: new Date(),
     subscriptionEndDate: new Date(new Date().getTime() + 1000 * 3600 * 24 * 30),
   };
-
   await createUser(user);
 
   res.sendStatus(200);
