@@ -1,7 +1,5 @@
-import { dbClient, ddbDocClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
-import { ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
+import { ddbDocClient } from './dynamo-db';
+import { ScanCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 import { User } from './db-types';
 
@@ -17,7 +15,6 @@ export async function getUser(phone: string): Promise<User | null> {
     });
     //   const command = new GetItemCommand(params);
     const response = await ddbDocClient.send(params);
-    console.log(response);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
@@ -54,60 +51,30 @@ export async function getUser(phone: string): Promise<User | null> {
   }
 }
 
-export async function writeUser(userInfo: User | any) {
-  // TODO: remove "any" as this eradicates type safety
-  const user: User = {
-    id: userInfo.id || uuidv4(), // generate random UUID
-    created: new Date(),
-    firstname: userInfo.firstname,
-    lastname: userInfo.lastname,
-    birthdate: userInfo.birthdate,
-    phone: userInfo.phone,
-    email: userInfo.email,
-    numberOfChildren: userInfo.numberOfChildren,
-    introduction: userInfo.introduction,
-    stressScore: 0,
-    exerciseMode: userInfo.exerciseMode,
-    exerciseName: userInfo.exerciseName,
-    exerciseStep: userInfo.exerciseStep,
-    exerciseLastParticipated: userInfo.exerciseLastParticipated,
-    subscriptionStartDate: userInfo.subscriptionStartDate,
-    subscriptionEndDate: userInfo.subscriptionEndDate,
+export async function writeUser(user: User) {
+  // convert dates to iso strings
+  const convertedUser = {
+    ...user,
+    created: user.created.toISOString(),
+    birthdate: user.birthdate.toISOString(),
+    exerciseLastParticipated: user.exerciseLastParticipated.toISOString(),
+    subscriptionStartDate: user.subscriptionStartDate.toISOString(),
+    subscriptionEndDate: user.subscriptionEndDate
+      ? user.subscriptionEndDate.toISOString()
+      : null,
   };
-  const putCommand = new PutItemCommand({
+
+  const putCommand = new PutCommand({
     TableName: tableName,
-    Item: {
-      id: { S: user.id },
-      created: { N: `${user.created.getTime()}` },
-      firstname: { S: user.firstname },
-      lastname: { S: user.lastname },
-      birthdate: { N: `${user.birthdate.getTime()}` },
-      phone: { S: user.phone },
-      email: { S: user.email },
-      numberOfChildren: { N: `${user.numberOfChildren}` },
-      introduction: { S: user.introduction },
-      stressScore: { N: `${user.stressScore}` },
-      exerciseMode: { BOOL: user.exerciseMode },
-      exerciseName: { S: user.exerciseName },
-      exerciseStep: { N: `${user.exerciseStep}` },
-      exerciseLastParticipated: {
-        N: `${user.exerciseLastParticipated.getTime()}`,
-      },
-      subscriptionStartDate: { N: `${user.subscriptionStartDate.getTime()}` },
-      subscriptionEndDate: user.subscriptionEndDate
-        ? {
-            N: `${user.subscriptionEndDate.getTime()}`,
-          }
-        : { NULL: true },
-    },
+    Item: convertedUser,
   });
-  await dbClient.send(putCommand);
+  await ddbDocClient.send(putCommand);
   console.log('written user');
 
   return user;
 }
 
-export async function createUser(userInfo: any) {
+export async function createUser(userInfo: User) {
   const existingUser = await getUser(userInfo.phone);
   if (!existingUser) {
     writeUser(userInfo);

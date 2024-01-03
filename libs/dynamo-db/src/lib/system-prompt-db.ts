@@ -1,10 +1,5 @@
-import { ddbDocClient, dbClient } from './dynamo-db';
-import {
-  DynamoDBDocumentClient,
-  UpdateCommand,
-  PutCommand,
-  ScanCommand,
-} from '@aws-sdk/lib-dynamodb';
+import { ddbDocClient } from './dynamo-db';
+import { UpdateCommand, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GPTSystemPrompt } from './db-types';
@@ -19,17 +14,17 @@ export async function getAllSystemPrompts(): Promise<GPTSystemPrompt[] | null> {
       //   },
     });
 
-    const response = await dbClient.send(params);
+    const response = await ddbDocClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const items = response.Items;
       const prompts: GPTSystemPrompt[] = [];
       items.forEach((item) => {
         const prompt: GPTSystemPrompt = {
-          id: item.id.S,
-          created: new Date(Number(item.created.N)),
-          prompt: item.prompt.S,
-          current: item.current.BOOL,
+          id: item.id,
+          created: new Date(item.created),
+          prompt: item.prompt,
+          current: item.current,
         };
         prompts.push(prompt);
       });
@@ -53,20 +48,20 @@ export async function getSystemPrompt(
       TableName: 'full-circle-gpt-system-prompts',
       FilterExpression: 'current = :value',
       ExpressionAttributeValues: {
-        ':value': { BOOL: current },
+        ':value': current,
       },
       Limit: 1,
     });
 
-    const response = await dbClient.send(params);
+    const response = await ddbDocClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
 
       const systemPrompt: GPTSystemPrompt = {
-        id: item.id.S,
-        created: new Date(Number(item.created.N)),
-        prompt: item.prompt.S,
+        id: item.id,
+        created: new Date(item.created),
+        prompt: item.prompt,
         current: true,
       };
 
@@ -136,7 +131,7 @@ export async function writeSystemPrompt(prompt: string) {
       current: systemPrompt.current,
     },
   });
-  await dbClient.send(putCommand);
+  await ddbDocClient.send(putCommand);
   console.log('created new system prompt');
 
   // modify all other system prompts as current
@@ -145,7 +140,6 @@ export async function writeSystemPrompt(prompt: string) {
 }
 
 export async function updatePrompt(prompt: GPTSystemPrompt) {
-  const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
   const command = new UpdateCommand({
     TableName: 'full-circle-gpt-system-prompts',
     Key: {

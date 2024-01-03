@@ -15,7 +15,7 @@ export async function messageProcessor(req: Request, res: Response) {
 
     // Retrieve user profile
     const user = await getUser(phone);
-    return;
+    // return;
     if (!user) {
       // User not registered with the service yet
       // Send message to this phone number to sign up for services

@@ -1,5 +1,6 @@
-import { dbClient } from './dynamo-db';
-import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { ddbDocClient } from './dynamo-db';
+// import { PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Message } from './db-types';
@@ -15,23 +16,23 @@ export async function getMessages(
       ScanIndexForward: false,
       Limit: limit || 5,
       ExpressionAttributeValues: {
-        ':value': { S: userId }, // Use the appropriate data type (S for String, N for Number, etc.)
+        ':value': userId, // Use the appropriate data type (S for String, N for Number, etc.)
       },
     });
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.send(params);
+    const response = await ddbDocClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const items = response.Items;
       const messages: Message[] = [];
       items.forEach((item) => {
         const message: Message = {
-          id: item.id.S,
-          created: new Date(Number(item.created.N)),
+          id: item.id,
+          created: new Date(item.created),
           userId: userId,
-          userMessage: item.userMessage.S,
-          gptResponse: item.gptResponse.S,
-          gptModel: item.gptModel.S,
+          userMessage: item.userMessage,
+          gptResponse: item.gptResponse,
+          gptModel: item.gptModel,
         };
         messages.push(message);
       });
@@ -60,18 +61,11 @@ export async function createMessage(
     gptResponse: gptResponse,
     gptModel: process.env.GPT_MODEL3 || '',
   };
-  const putCommand = new PutItemCommand({
+  const putCommand = new PutCommand({
     TableName: 'full-circle-messages',
-    Item: {
-      id: { S: message.id },
-      created: { N: `${message.created.getTime()}` },
-      userId: { S: `${message.userId}` },
-      userMessage: { S: message.userMessage },
-      gptResponse: { S: message.gptResponse },
-      gptModel: { S: message.gptModel },
-    },
+    Item: { ...message, created: message.created.toISOString() },
   });
-  await dbClient.send(putCommand);
+  await ddbDocClient.send(putCommand);
   console.log('created new message');
 
   return message;
