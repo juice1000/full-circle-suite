@@ -1,42 +1,42 @@
 import { useState, useEffect } from 'react';
-import {
-  getAllSystemPrompts,
-  GPTSystemPrompt,
-  updatePrompt,
-  writeSystemPrompt,
-  dbClient,
-} from '@libs/dynamo-db';
+// import {
+//   getAllSystemPrompts,
+//   GPTSystemPrompt,
+//   updatePrompt,
+//   writeSystemPrompt,
+//   dbClient,
+// } from '@libs/dynamo-db';
 import { classNames } from '../../utls';
 
 const ControlPanel = () => {
   const [AIModel, setAIModel] = useState('');
-  const [currentPrompt, setCurrentPrompt] = useState<GPTSystemPrompt>();
+  // const [currentPrompt, setCurrentPrompt] = useState<GPTSystemPrompt>();
   const [promptInput, setPromptInput] = useState('');
-  const [systemPrompts, setSystemPrompts] = useState<GPTSystemPrompt[]>([]);
+  // const [systemPrompts, setSystemPrompts] = useState<GPTSystemPrompt[]>([]);
 
-  const saveSystemPrompt = (e: React.MouseEvent) => {
-    e.preventDefault();
-    console.log('saving');
-    if (currentPrompt) {
-      updatePrompt(currentPrompt);
-      setCurrentPrompt(currentPrompt);
-    } else {
-      writeSystemPrompt(promptInput);
-    }
-  };
-  useEffect(() => {
-    console.log('dbClient:', dbClient);
+  // const saveSystemPrompt = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   console.log('saving');
+  //   if (currentPrompt) {
+  //     updatePrompt(currentPrompt);
+  //     setCurrentPrompt(currentPrompt);
+  //   } else {
+  //     writeSystemPrompt(promptInput);
+  //   }
+  // };
+  // useEffect(() => {
+  //   console.log('dbClient:', dbClient);
 
-    getAllSystemPrompts().then((prompts) => {
-      console.log(prompts);
-      if (prompts) {
-        setSystemPrompts(prompts);
-        const currentPrompt = prompts.find((prompt) => prompt.current);
-        setCurrentPrompt(currentPrompt);
-        setPromptInput(currentPrompt?.prompt || '');
-      }
-    });
-  }, [currentPrompt]);
+  //   getAllSystemPrompts().then((prompts) => {
+  //     console.log(prompts);
+  //     if (prompts) {
+  //       setSystemPrompts(prompts);
+  //       const currentPrompt = prompts.find((prompt) => prompt.current);
+  //       setCurrentPrompt(currentPrompt);
+  //       setPromptInput(currentPrompt?.prompt || '');
+  //     }
+  //   });
+  // }, [currentPrompt]);
   return (
     <main>
       <h1 className="text-6xl font-bold">Control Panel</h1>
@@ -59,7 +59,7 @@ const ControlPanel = () => {
         <button
           id="submit-button"
           className="btn mt-4"
-          onClick={saveSystemPrompt}
+          // onClick={saveSystemPrompt}
         >
           Save
         </button>
