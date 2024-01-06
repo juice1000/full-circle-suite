@@ -3,7 +3,7 @@ import styles from './App.module.css';
 
 import { Route, Routes, Link, BrowserRouter as Router } from 'react-router-dom';
 import SidebarNavigation from './components/SidebarNavigation';
-import Dashboard from './components/Dashboard';
+import Analytics from './components/Analytics';
 import PageNotFound from './components/PageNotFound';
 import ControlPanel from './components/ControlPanel';
 import Settings from './components/Settings';
@@ -33,8 +33,8 @@ function RenderItem() {
               </div>
               <div className="basis-5/6 overflow-scroll p-14">
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/analytics" element={<Dashboard />} />
+                  <Route path="/" element={<Analytics />} />
+                  <Route path="/analytics" element={<Analytics />} />
                   <Route path="/controls" element={<ControlPanel />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<PageNotFound />} />

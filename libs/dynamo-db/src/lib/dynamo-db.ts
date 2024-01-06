@@ -41,7 +41,9 @@ async function deleteTable(tableName: string) {
 export async function initializeDB(region: string) {
   if (!dbClient) {
     const config = {
-      region: region,
+      region: process.env.AWS_REGION_EU_NORTH,
+      // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     };
 
     dbClient = new DynamoDBClient(config);

@@ -2,7 +2,7 @@ import { getUsers, updateUser } from '@libs/dynamo-db-cloud-api';
 import { User } from '@libs/dynamo-db';
 import { useState, useEffect } from 'react';
 
-const Dashboard = () => {
+const Analytics = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
@@ -32,4 +32,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Analytics;
