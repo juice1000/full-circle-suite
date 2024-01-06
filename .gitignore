@@ -43,3 +43,5 @@ Thumbs.db
 
 .env
 *.pem
+
+*/**/aws-exports.js

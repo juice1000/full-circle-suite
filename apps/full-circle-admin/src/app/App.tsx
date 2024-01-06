@@ -9,13 +9,14 @@ import ControlPanel from './components/ControlPanel';
 import Settings from './components/Settings';
 // import loader from '../assets/Ball-Loader.gif';
 
-import { Amplify } from 'aws-amplify';
+// import { Amplify } from 'aws-amplify';
 import { Authenticator, ThemeProvider } from '@aws-amplify/ui-react';
 import { AuthStyle } from './AuthUI';
 import '@aws-amplify/ui-react/styles.css';
-import * as config from '../amplify-backend/src/amplifyconfiguration.json';
+// import awsmobile from '../amplify-backend/src/aws-exports';
+//import * as config from '../amplify-backend/src/amplifyconfiguration.json';
 
-Amplify.configure(config);
+// Amplify.configure(awsmobile);
 
 function RenderItem() {
   return (
