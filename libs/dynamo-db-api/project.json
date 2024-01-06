@@ -1,0 +1,23 @@
+{
+  "name": "dynamo-db-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/dynamo-db-api/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/dynamo-db-api",
+        "main": "libs/dynamo-db-api/src/index.ts",
+        "tsConfig": "libs/dynamo-db-api/tsconfig.lib.json",
+        "assets": ["libs/dynamo-db-api/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  },
+  "tags": []
+}
