@@ -1,9 +1,11 @@
 import {
-  DynamoDB,
+  DynamoDBClient,
   CreateTableCommand,
   CreateTableCommandInput,
   DeleteTableCommand,
+  ListTablesCommand,
 } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import {
   messageSchema,
   userSchema,
@@ -12,9 +14,10 @@ import {
   guidedExerciseSchema,
 } from './table-schemas';
 
-let dbClient: DynamoDB;
+let dbClient: DynamoDBClient;
+let ddbDocClient: DynamoDBDocumentClient;
 async function createTable(
-  dbClient: DynamoDB,
+  dbClient: DynamoDBClient,
   input: CreateTableCommandInput,
   name: string
 ) {
@@ -35,18 +38,23 @@ async function deleteTable(tableName: string) {
   console.log('successfully deleted: ', tableName);
 }
 
-export async function initializeDB() {
+export async function initializeDB(region: string) {
   if (!dbClient) {
     const config = {
       region: process.env.AWS_REGION_EU_NORTH,
       // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     };
-    dbClient = new DynamoDB(config);
+
+    dbClient = new DynamoDBClient(config);
+    ddbDocClient = DynamoDBDocumentClient.from(dbClient);
+    // console.log(dbClient);
   }
   try {
-    const results = await dbClient.listTables({});
-    // console.log('available tables in DynamoDB:\n', results.TableNames);
+    const command = new ListTablesCommand({});
+    const results = await dbClient.send(command);
+
+    //console.log('available tables in DynamoDB:\n', results.TableNames);
     if (results.TableNames) {
       if (!results.TableNames.includes('full-circle-messages')) {
         await createTable(dbClient, messageSchema, 'full-circle-messages');
@@ -86,9 +94,12 @@ export async function initializeDB() {
 export async function deleteTables() {
   try {
     if (!dbClient) {
-      dbClient = new DynamoDB({ region: process.env.AWS_REGION_EU_NORTH });
+      dbClient = new DynamoDBClient({
+        region: process.env.AWS_REGION_EU_NORTH,
+      });
     }
-    const results = await dbClient.listTables({});
+    const command = new ListTablesCommand({});
+    const results = await dbClient.send(command);
     //console.log('available tables in DynamoDB:\n', results.TableNames);
     if (results.TableNames) {
       if (results.TableNames.includes('full-circle-messages')) {
@@ -112,4 +123,4 @@ export async function deleteTables() {
   }
 }
 
-export { dbClient };
+export { dbClient, ddbDocClient };

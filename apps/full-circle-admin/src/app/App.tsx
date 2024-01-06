@@ -9,20 +9,24 @@ import ControlPanel from './components/ControlPanel';
 import Settings from './components/Settings';
 // import loader from '../assets/Ball-Loader.gif';
 
-import { Amplify } from 'aws-amplify';
+// import { Amplify } from 'aws-amplify';
 import { Authenticator, ThemeProvider } from '@aws-amplify/ui-react';
 import { AuthStyle } from './AuthUI';
 import '@aws-amplify/ui-react/styles.css';
-import config from '../amplifyconfiguration.json';
+// import awsmobile from '../amplify-backend/src/aws-exports';
+//import * as config from '../amplify-backend/src/amplifyconfiguration.json';
 
-Amplify.configure(config);
+// Amplify.configure(awsmobile);
 
 function RenderItem() {
   return (
     <ThemeProvider theme={AuthStyle()}>
-      <Authenticator hideSignUp={true} className="w-screen h-full">
+      <Authenticator
+        hideSignUp={true}
+        className="w-screen h-full bg-primary-light"
+      >
         {({ signOut }) => (
-          <div className="flex">
+          <div className="flex w-screen">
             <Router>
               <div className="basis-1/6">
                 <SidebarNavigation signOut={signOut} />

@@ -8,7 +8,7 @@ import axios, { AxiosResponse } from 'axios';
 export function whatsAppVerify(req: Request, res: Response) {
   // This is required for verification of the webhook
   // console.log('\nCalling whatsAppVerify\n');
-  const verifyToken = 'webhook-verify-token';
+  const verifyToken = 'token';
   if (
     req.query['hub.mode'] == 'subscribe' &&
     req.query['hub.verify_token'] == verifyToken

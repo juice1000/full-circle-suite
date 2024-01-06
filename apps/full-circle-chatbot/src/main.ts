@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
 import { messageProcessor } from './controllers/controller-whatsapp';
+import { v4 as uuidv4 } from 'uuid';
 
 // ***************************************** NX LIBRARIES ***************************************
 
@@ -9,12 +10,13 @@ import {
   createExercise,
   getExercise,
   createUser,
+  User,
 } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
 
 // deleteTables();
-initializeDB();
+initializeDB(process.env.AWS_REGION_EU_NORTH);
 
 // ************************************************************************************************
 // ************************************************************************************************
@@ -65,24 +67,25 @@ app.get('/create-user', async (req: Request, res: Response) => {
   // TODO: create user profile after signup
   console.log('create demo user');
   //const userInfo = req.body;
-  const user = {
+  const user: User = {
+    id: uuidv4(),
     firstname: 'Julien',
     lastname: 'Look',
+    created: new Date(),
     birthdate: new Date('1996-04-25'),
     phone: '4917643209870',
     email: '',
     numberOfChildren: 2,
     introduction:
-      'Julien is a father and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. He has a 2-year-old son and a 5-year-old daughter. He speaks Singlish.',
+      'Julien is a father and a founder of multiple companies. He believes in the Montessori approach when it comes to raising her kids. He has a 2-year-old son and a 5-year-old daughter. He speaks Singlish.',
     stressScore: 0,
     exerciseMode: false,
     exerciseName: '',
     exerciseStep: 0,
     exerciseLastParticipated: new Date(),
     subscriptionStartDate: new Date(),
-    subscriptionEndDate: null,
+    subscriptionEndDate: new Date(new Date().getTime() + 1000 * 3600 * 24 * 30),
   };
-
   await createUser(user);
 
   res.sendStatus(200);

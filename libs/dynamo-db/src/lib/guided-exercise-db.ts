@@ -1,5 +1,6 @@
-import { dbClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { ddbDocClient } from './dynamo-db';
+// import { PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { ScanCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GuidedExercise } from './db-types';
@@ -8,27 +9,27 @@ export async function getExercise(
   name: string
 ): Promise<GuidedExercise | null> {
   try {
-    const params = {
+    const params = new ScanCommand({
       TableName: 'full-circle-guided-exercises',
       FilterExpression: 'exerciseName = :value',
       ExpressionAttributeValues: {
-        ':value': { S: name },
+        ':value': name,
       },
       Limit: 1,
-    };
+    });
 
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await ddbDocClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
 
       const exercise: GuidedExercise = {
-        id: item.id.S,
-        created: new Date(Number(item.created.N)),
-        exerciseName: item.exerciseName.S,
-        steps: Number(item.steps.N),
-        questions: item.questions.L.map((question) => question.S),
+        id: item.id,
+        created: new Date(item.created),
+        exerciseName: item.exerciseName,
+        steps: item.steps,
+        questions: item.questions,
       };
 
       return exercise;
@@ -55,21 +56,11 @@ export async function writeExercise(
     questions: questions,
   };
 
-  const putCommand = new PutItemCommand({
+  const putCommand = new PutCommand({
     TableName: 'full-circle-guided-exercises',
-    Item: {
-      id: { S: exercise.id },
-      exerciseName: { S: exercise.exerciseName },
-      created: { N: `${exercise.created.getTime()}` },
-      steps: { N: `${exercise.steps}` },
-      questions: {
-        L: exercise.questions.map((question) => {
-          return { S: question };
-        }),
-      },
-    },
+    Item: { ...exercise, created: exercise.created.toISOString() },
   });
-  await dbClient.send(putCommand);
+  await ddbDocClient.send(putCommand);
   console.log('created new exercise');
 
   return exercise;

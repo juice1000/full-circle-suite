@@ -1,111 +1,80 @@
-import { dbClient } from './dynamo-db';
-import { PutItemCommand } from '@aws-sdk/client-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
+import { ddbDocClient } from './dynamo-db';
+import { ScanCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 import { User } from './db-types';
 
+const tableName = 'full-circle-users';
 export async function getUser(phone: string): Promise<User | null> {
   try {
-    const params = {
-      TableName: 'full-circle-users',
+    const params = new ScanCommand({
+      TableName: tableName,
       FilterExpression: 'phone = :value',
       ExpressionAttributeValues: {
-        ':value': { S: phone }, // Use the appropriate data type (S for String, N for Number, etc.)
+        ':value': phone, // Use the appropriate data type (S for String, N for Number, etc.)
       },
-    };
+    });
     //   const command = new GetItemCommand(params);
-    const response = await dbClient.scan(params);
+    const response = await ddbDocClient.send(params);
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
+      // console.log(item);
 
       const user: User = {
-        id: item.id.S,
-        created: new Date(Number(item.created.N)),
-        firstname: item.firstname?.S,
-        lastname: item.lastname?.S,
-        birthdate: new Date(Number(item.birthdate?.N)),
-        phone: item.phone.S,
-        stressScore: Number(item.stressScore.N),
-        email: item.email?.S,
-        numberOfChildren: Number(item.numberOfChildren?.N),
-        introduction: item.introduction?.S,
-        exerciseMode: item.exerciseMode.BOOL,
-        exerciseName: item.exerciseName?.S,
-        exerciseStep: Number(item.exerciseStep?.N),
-        exerciseLastParticipated: new Date(
-          Number(item.exerciseLastParticipated?.N)
-        ),
-        subscriptionStartDate: new Date(Number(item.subscriptionStartDate?.N)),
-        subscriptionEndDate: item.subscriptionEndDate?.NULL
-          ? null
-          : new Date(Number(item.subscriptionEndDate?.N)),
+        id: item.id,
+        created: new Date(item.created),
+        firstname: item.firstname,
+        lastname: item.lastname,
+        birthdate: new Date(item.birthdate),
+        phone: item.phone,
+        stressScore: item.stressScore,
+        email: item.email,
+        numberOfChildren: item.numberOfChildren,
+        introduction: item.introduction,
+        exerciseMode: item.exerciseMode,
+        exerciseName: item.exerciseName,
+        exerciseStep: item.exerciseStep,
+        exerciseLastParticipated: new Date(item.exerciseLastParticipated),
+        subscriptionStartDate: new Date(item.subscriptionStartDate),
+        subscriptionEndDate: new Date(item.subscriptionEndDate),
       };
+      // console.log(user);
+
       return user;
     } else {
       console.log('no user found');
       return null;
     }
   } catch (err) {
-    console.log('error retrieving user');
+    console.log('error retrieving user', err);
     return null;
   }
 }
 
-export async function writeUser(userInfo: User | any) {
-  // TODO: remove "any" as this eradicates type safety
-  const user: User = {
-    id: userInfo.id || uuidv4(), // generate random UUID
-    created: new Date(),
-    firstname: userInfo.firstname,
-    lastname: userInfo.lastname,
-    birthdate: userInfo.birthdate,
-    phone: userInfo.phone,
-    email: userInfo.email,
-    numberOfChildren: userInfo.numberOfChildren,
-    introduction: userInfo.introduction,
-    stressScore: 0,
-    exerciseMode: userInfo.exerciseMode,
-    exerciseName: userInfo.exerciseName,
-    exerciseStep: userInfo.exerciseStep,
-    exerciseLastParticipated: userInfo.exerciseLastParticipated,
-    subscriptionStartDate: userInfo.subscriptionStartDate,
-    subscriptionEndDate: userInfo.subscriptionEndDate,
+export async function writeUser(user: User) {
+  // convert dates to iso strings
+  const convertedUser = {
+    ...user,
+    created: user.created.toISOString(),
+    birthdate: user.birthdate.toISOString(),
+    exerciseLastParticipated: user.exerciseLastParticipated.toISOString(),
+    subscriptionStartDate: user.subscriptionStartDate.toISOString(),
+    subscriptionEndDate: user.subscriptionEndDate
+      ? user.subscriptionEndDate.toISOString()
+      : null,
   };
-  const putCommand = new PutItemCommand({
-    TableName: 'full-circle-users',
-    Item: {
-      id: { S: user.id },
-      created: { N: `${user.created.getTime()}` },
-      firstname: { S: user.firstname },
-      lastname: { S: user.lastname },
-      birthdate: { N: `${user.birthdate.getTime()}` },
-      phone: { S: user.phone },
-      email: { S: user.email },
-      numberOfChildren: { N: `${user.numberOfChildren}` },
-      introduction: { S: user.introduction },
-      stressScore: { N: `${user.stressScore}` },
-      exerciseMode: { BOOL: user.exerciseMode },
-      exerciseName: { S: user.exerciseName },
-      exerciseStep: { N: `${user.exerciseStep}` },
-      exerciseLastParticipated: {
-        N: `${user.exerciseLastParticipated.getTime()}`,
-      },
-      subscriptionStartDate: { N: `${user.subscriptionStartDate.getTime()}` },
-      subscriptionEndDate: user.subscriptionEndDate
-        ? {
-            N: `${user.subscriptionEndDate.getTime()}`,
-          }
-        : { NULL: true },
-    },
+
+  const putCommand = new PutCommand({
+    TableName: tableName,
+    Item: convertedUser,
   });
-  await dbClient.send(putCommand);
+  await ddbDocClient.send(putCommand);
   console.log('written user');
 
   return user;
 }
 
-export async function createUser(userInfo: any) {
+export async function createUser(userInfo: User) {
   const existingUser = await getUser(userInfo.phone);
   if (!existingUser) {
     writeUser(userInfo);

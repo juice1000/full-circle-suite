@@ -6,7 +6,7 @@ export const messageSchema: CreateTableCommandInput = {
       AttributeName: 'userId',
       AttributeType: 'S',
     },
-    { AttributeName: 'created', AttributeType: 'N' },
+    { AttributeName: 'created', AttributeType: 'S' },
   ],
   KeySchema: [
     {
@@ -28,7 +28,7 @@ export const userSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
-    { AttributeName: 'created', AttributeType: 'N' },
+    { AttributeName: 'created', AttributeType: 'S' },
   ],
   KeySchema: [
     {
@@ -50,7 +50,7 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
-    { AttributeName: 'created', AttributeType: 'N' },
+    { AttributeName: 'created', AttributeType: 'S' },
   ],
   KeySchema: [
     {
@@ -72,7 +72,7 @@ export const selectedTrainingDataSchema: CreateTableCommandInput = {
       AttributeName: 'userId',
       AttributeType: 'S',
     },
-    { AttributeName: 'created', AttributeType: 'N' },
+    { AttributeName: 'created', AttributeType: 'S' },
   ],
   KeySchema: [
     {
@@ -94,7 +94,7 @@ export const guidedExerciseSchema: CreateTableCommandInput = {
       AttributeName: 'id',
       AttributeType: 'S',
     },
-    { AttributeName: 'created', AttributeType: 'N' },
+    { AttributeName: 'created', AttributeType: 'S' },
   ],
   KeySchema: [
     {
