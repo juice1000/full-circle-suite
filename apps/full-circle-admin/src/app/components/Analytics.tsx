@@ -43,7 +43,7 @@ const Analytics = () => {
   const usersToday = getUsersToday(users);
   const activeUsersThisWeek = getActiveUsersThisWeek(users);
   const activeUsersThisMonth = getActiveUsersThisMonth(users);
-
+  const usersThatSentMessages = getUsersThatSentMessages(users);
   const dailyActiveUsers = getDailyActiveUserRatio(users);
   // console.log('usersToday: ', usersToday);
 
@@ -63,19 +63,18 @@ const Analytics = () => {
                 <p>Total Users</p>
                 <h3>{users.length}</h3>
               </div>
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
-                <p>New Users [{getMonthName(today.getMonth())}]</p>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
+                <p>New Users This Month</p>
                 <h3>{newUsersThisMonth.length}</h3>
               </div>
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
-                <p>Users Today</p>
-                <h3> {usersToday.length}</h3>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
+                <p>Active Users</p>
+                <p className="text-xs">(interacted with the Chatbot)</p>
+                <h3> {usersThatSentMessages.length}</h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
-                <p>Daily Active Users</p>
-                <h3>
-                  {Math.floor(dailyActiveUsers.length / users.length) * 100}%
-                </h3>
+                <p>Total Users Today</p>
+                <h3> {usersToday.length}</h3>
               </div>
 
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
@@ -91,6 +90,12 @@ const Analytics = () => {
                   {' '}
                   {Math.floor(activeUsersThisMonth.length / users.length) * 100}
                   %
+                </h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Daily Active Users</p>
+                <h3>
+                  {Math.floor(dailyActiveUsers.length / users.length) * 100}%
                 </h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
@@ -173,6 +178,12 @@ function getDailyActiveUserRatio(users: UserMessages[]) {
   // console.log(filteredUsers);
 
   return filteredUsers;
+}
+
+function getUsersThatSentMessages(users: UserMessages[]) {
+  return users.filter((user: UserMessages) => {
+    return user.messages.length > 0;
+  });
 }
 
 function averageMessagesPerDay(users: UserMessages[]) {
