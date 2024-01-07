@@ -1,8 +1,9 @@
 import { getUsers, getMessages } from '@libs/dynamo-db-cloud-api';
 import { Message, User } from '@libs/dynamo-db';
 import { useState, useEffect } from 'react';
-import { getMonthName, getWeek } from '../../utls';
+import { getWeek } from '../../utls';
 import ball_loader from '../../assets/Ball-Loader.gif';
+import Plot from 'react-plotly.js';
 
 interface UserMessages {
   user: User;
@@ -45,6 +46,7 @@ const Analytics = () => {
   const activeUsersThisMonth = getActiveUsersThisMonth(users);
   const usersThatSentMessages = getUsersThatSentMessages(users);
   const dailyActiveUsers = getDailyActiveUserRatio(users);
+  const timeSetupToFirstMessage = getTimeSetupToFirstMessage(users);
   // console.log('usersToday: ', usersToday);
 
   const messagesPerDay = averageMessagesPerDay(users);
@@ -102,6 +104,9 @@ const Analytics = () => {
                 <p>Average Message Count / Day</p>
                 <h3> {messagesPerDay}</h3>
               </div>
+            </div>
+            <div className="mt-10">
+              <Boxplot timeDifferences={timeSetupToFirstMessage} />
             </div>
           </div>
         )}
@@ -235,6 +240,47 @@ function isThreeMessagesPerDay(createdDates: string[]): boolean {
   }
 
   return true;
+}
+
+function getTimeSetupToFirstMessage(users: UserMessages[]) {
+  return users.map((user: UserMessages) => {
+    const messagesCreated = user.messages.map((message) =>
+      message.created.getTime()
+    );
+    const earliestMessageTime = Math.min(...messagesCreated);
+    const firstMessage = user.messages.find(
+      (message) => message.created.getTime() === earliestMessageTime
+    );
+    if (!firstMessage) return 0;
+    return (
+      // we get the hourly difference
+      (firstMessage.created.getTime() - user.user.created.getTime()) / 3600000
+    );
+  });
+}
+
+function Boxplot({ timeDifferences }: { timeDifferences: number[] }) {
+  const trace = {
+    x: timeDifferences, // Your data here
+    type: 'box',
+    name: '',
+  };
+
+  const layout = {
+    title: 'Time Distribution from User Registration to First Bot Interaction',
+    xaxis: {
+      title: 'Hours',
+      zeroline: false,
+    },
+  };
+
+  return (
+    <Plot
+      data={[trace]}
+      layout={layout}
+      style={{ width: '100%', height: '100%' }}
+    />
+  );
 }
 
 export default Analytics;
