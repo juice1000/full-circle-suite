@@ -1,6 +1,6 @@
 const Settings = () => {
   return (
-    <div>
+    <div className="m-14">
       <main>
         <h1 className="text-6xl font-bold">Settings</h1>
 

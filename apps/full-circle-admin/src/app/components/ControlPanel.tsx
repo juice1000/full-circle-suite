@@ -38,7 +38,7 @@ const ControlPanel = () => {
   //   });
   // }, [currentPrompt]);
   return (
-    <main>
+    <main className="m-14">
       <h1 className="text-6xl font-bold">Control Panel</h1>
 
       <h1 className="mt-8 text-3xl font-bold">GPT System Prompt</h1>

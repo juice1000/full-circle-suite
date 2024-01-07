@@ -17,3 +17,28 @@ body {
     @apply w-full rounded-md border-0 py-2.5 px-4 pl-3 pr-12 shadow-sm text-gray-900  sm:text-sm sm:leading-6 bg-gray-200;
   }
 }
+
+h1 {
+  font-size: 2.5em;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 2em;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.75em;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+h5 {
+  font-size: 1.25em;
+  font-weight: 700;
+}

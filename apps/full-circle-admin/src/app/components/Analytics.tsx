@@ -1,35 +1,192 @@
-import { getUsers, updateUser } from '@libs/dynamo-db-cloud-api';
-import { User } from '@libs/dynamo-db';
+import { getUsers, getMessages } from '@libs/dynamo-db-cloud-api';
+import { Message, User } from '@libs/dynamo-db';
 import { useState, useEffect } from 'react';
+import { getMonthName, getWeek } from '../../utls';
+import ball_loader from '../../assets/Ball-Loader.gif';
+
+interface UserMessages {
+  user: User;
+  messages: Message[];
+}
+const today = new Date();
 
 const Analytics = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [users, setUsers] = useState<UserMessages[]>([]);
 
   useEffect(() => {
     getUsers().then((users) => {
-      setUsers(users);
+      if (users) {
+        Promise.all(
+          users.map((user: User) => {
+            user.created = new Date(user.created);
+            return getMessages(user.id).then((messages) => {
+              messages.forEach((message: Message) => {
+                message.created = new Date(message.created);
+              });
+              return {
+                user: user,
+                messages: messages,
+              };
+            });
+          })
+        ).then((userMessages) => {
+          // console.log('userMessages: ', userMessages);
+          setUsers(userMessages);
+          setLoaded(true);
+        });
+      }
     });
   }, []);
 
-  const changeUser = async () => {
-    if (users.length > 0) {
-      const user = { ...users[0] };
-      user.firstname = 'Ning';
-      await updateUser(user);
-    }
-  };
-  console.log(users[0]?.firstname);
+  const newUsersThisMonth = getNewUsersThisMonth(users);
+  const usersToday = getUsersToday(users);
+  const activeUsersThisWeek = getActiveUsersThisWeek(users);
+  const activeUsersThisMonth = getActiveUsersThisMonth(users);
+
+  const dailyActiveUsers = getDailyActiveUserRatio(users);
+  // console.log('usersToday: ', usersToday);
 
   return (
-    <div>
+    <div className="m-14">
       <main>
         <h1 className="text-6xl font-bold">Analytics</h1>
-        <button onClick={changeUser}>Change user</button>
-        <div className=""></div>
-        {/* Add more content and components as needed */}
+        {!loaded ? (
+          <div className="w-full flex justify-center">
+            <img className="w-96 h-96" src={ball_loader} alt="loader" />
+          </div>
+        ) : (
+          <div className="my-12">
+            <div className="flex flex-col gap-8 [&>div]:w-56">
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Total Users</p>
+                <h3>{users.length}</h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>New Users [{getMonthName(today.getMonth())}]</p>
+                <h3>{newUsersThisMonth.length}</h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Users Today</p>
+                <h3> {usersToday.length}</h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Daily Active Users</p>
+                <h3>
+                  {Math.floor(dailyActiveUsers.length / users.length) * 100}%
+                </h3>
+              </div>
+
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Users This Week</p>
+                <h3>
+                  {' '}
+                  {Math.floor(activeUsersThisWeek.length / users.length) * 100}%
+                </h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+                <p>Users This Month</p>
+                <h3>
+                  {' '}
+                  {Math.floor(activeUsersThisMonth.length / users.length) * 100}
+                  %
+                </h3>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 };
+
+function getNewUsersThisMonth(users: UserMessages[]) {
+  return users.filter((user: UserMessages) => {
+    return (
+      user.user.created.getMonth() === today.getMonth() &&
+      user.user.created.getFullYear() === today.getFullYear()
+    );
+  });
+}
+
+function getUsersToday(users: UserMessages[]) {
+  return users.filter((user) => {
+    return (
+      user.messages.find(
+        (message) => message.created.toDateString() === today.toDateString()
+      ) !== undefined
+    );
+  });
+}
+
+function getActiveUsersThisWeek(users: UserMessages[]) {
+  return users.filter((user: UserMessages) => {
+    return (
+      user.messages.find(
+        (message: Message) =>
+          getWeek(message.created) === getWeek(today) &&
+          message.created.getFullYear() === today.getFullYear()
+      ) !== undefined
+    );
+  });
+}
+
+function getActiveUsersThisMonth(users: UserMessages[]) {
+  return users.filter((user: UserMessages) => {
+    return (
+      user.messages.find(
+        (message: Message) =>
+          message.created.getMonth() === today.getMonth() &&
+          message.created.getFullYear() === today.getFullYear()
+      ) !== undefined
+    );
+  });
+}
+
+function getDailyActiveUserRatio(users: UserMessages[]) {
+  const daysOfCurrentMonth = today.getDate();
+  const filteredUsers = users.filter((user: UserMessages) => {
+    const datesThisMonth = user.messages
+      .filter((message: Message) => {
+        return (
+          message.created.getMonth() === today.getMonth() &&
+          message.created.getFullYear() === today.getFullYear()
+        );
+      })
+      .map((message: Message) => {
+        return message.created.toDateString();
+      });
+    const uniqueDatesThisMonth = [...new Set(datesThisMonth)];
+
+    // We check if the user has sent at least 3 messages each day he used the bot
+    const result = messagesPerDayCount(datesThisMonth);
+    if (result) return true;
+
+    // Then we check if the user has 70% participation rate in the current month
+    return uniqueDatesThisMonth.length / daysOfCurrentMonth > 0.7;
+  });
+  // console.log(filteredUsers);
+
+  return filteredUsers;
+}
+
+function messagesPerDayCount(createdDates: string[]): boolean {
+  const itemCounts = createdDates.reduce((counts, item) => {
+    if (item in counts) {
+      counts[item]++;
+    } else {
+      counts[item] = 1;
+    }
+    return counts;
+  }, {} as Record<string, number>);
+
+  for (const count of Object.values(itemCounts)) {
+    if (count < 3) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 export default Analytics;

@@ -90,7 +90,7 @@ app.post('/create-user', async (req: Request, res: Response) => {
     exerciseStep: 0,
     exerciseLastParticipated: new Date(),
     subscriptionStartDate: new Date(),
-    subscriptionEndDate: new Date(new Date().getTime() + 1000 * 3600 * 24 * 30),
+    subscriptionEndDate: null,
   };
   await createUser(user);
 

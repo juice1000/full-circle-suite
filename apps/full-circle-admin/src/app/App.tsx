@@ -26,12 +26,12 @@ function RenderItem() {
         className="w-screen h-full bg-primary-light"
       >
         {({ signOut }) => (
-          <div className="flex w-screen">
+          <div className="flex w-screen  h-full">
             <Router>
-              <div className="basis-1/6">
+              <div className="basis-1/6 h-full">
                 <SidebarNavigation signOut={signOut} />
               </div>
-              <div className="basis-5/6 overflow-scroll p-14">
+              <div className="basis-5/6 h-full overflow-scroll">
                 <Routes>
                   <Route path="/" element={<Analytics />} />
                   <Route path="/analytics" element={<Analytics />} />
