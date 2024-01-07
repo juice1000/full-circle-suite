@@ -38,17 +38,14 @@ async function deleteTable(tableName: string) {
   console.log('successfully deleted: ', tableName);
 }
 
-export async function initializeDB(region: string) {
+export async function initializeDB() {
   if (!dbClient) {
     const config = {
-      region: process.env.AWS_REGION_EU_NORTH,
-      // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION_AP_SOUTHEAST_1,
     };
 
     dbClient = new DynamoDBClient(config);
     ddbDocClient = DynamoDBDocumentClient.from(dbClient);
-    // console.log(dbClient);
   }
   try {
     const command = new ListTablesCommand({});
@@ -95,7 +92,7 @@ export async function deleteTables() {
   try {
     if (!dbClient) {
       dbClient = new DynamoDBClient({
-        region: process.env.AWS_REGION_EU_NORTH,
+        region: process.env.AWS_REGION_AP_SOUTHEAST_1,
       });
     }
     const command = new ListTablesCommand({});

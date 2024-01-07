@@ -31,9 +31,12 @@ export async function executeGPTModel(
       console.log(completion.choices[0].message.content);
       return completion.choices[0].message.content;
     } else {
+      console.error('error generating response from GPT3, no response found');
       return 'An unexpected error occured, the chatbot AI could not respond';
     }
   } catch (err) {
+    console.error('error generating response from GPT3', err);
+
     return 'An unexpected error occured, the chatbot AI could not respond';
   }
 }
