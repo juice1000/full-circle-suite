@@ -18,12 +18,12 @@ export interface User {
   firstname: string;
   lastname?: string;
   email?: string;
-  birthdate?: Date;
+  birthdate: Date;
   numberOfChildren?: number;
   introduction?: string;
   exerciseName?: string;
   exerciseStep?: number;
-  exerciseLastParticipated?: Date;
+  exerciseLastParticipated: Date;
 }
 
 export interface GPTSystemPrompt {
