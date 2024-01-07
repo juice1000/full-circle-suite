@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import { messageProcessor } from './controllers/controller-whatsapp';
 import { v4 as uuidv4 } from 'uuid';
+import { extractSignupUserInformation } from '@libs/dynamo-db';
 
 // ***************************************** NX LIBRARIES ***************************************
 
@@ -63,10 +64,15 @@ app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
 });
 
 // TODO: this function is still in the making and only for demo purposes
-app.get('/create-user', async (req: Request, res: Response) => {
+app.post('/create-user', async (req: Request, res: Response) => {
   // TODO: create user profile after signup
   console.log('create demo user');
-  //const userInfo = req.body;
+  const userInfo = req.body;
+  // console.log(userInfo);
+  // if (userInfo) {
+  //   extractSignupUserInformation(userInfo.form_response);
+  // }
+
   const user: User = {
     id: uuidv4(),
     firstname: 'Julien',
