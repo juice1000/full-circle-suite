@@ -3,7 +3,7 @@ import { sendUserMessage, whatsAppRetreiveMessage } from '@libs/whats-app';
 
 import { getUser } from '@libs/dynamo-db';
 import { controllerMessageLevel } from './controller-message-level';
-import { deleteKey, findKey, writeKey } from '../io-redis';
+// import { deleteKey, findKey, writeKey } from '../io-redis';
 
 export async function messageProcessor(req: Request, res: Response) {
   // Extract whats app user information
@@ -38,32 +38,33 @@ export async function messageProcessor(req: Request, res: Response) {
       );
     } else {
       // debouncing message input
-      const id = user.id;
-      let redisData = await findKey(id);
+      // const id = user.id;
+      // let redisData = await findKey(id);
 
-      if (redisData) {
-        redisData.messages += `\n${messageText}`;
-        redisData.lastMessage = new Date();
-      } else {
-        redisData = { messages: messageText, lastMessage: new Date() };
-      }
+      // if (redisData) {
+      //   redisData.messages += `\n${messageText}`;
+      //   redisData.lastMessage = new Date();
+      // } else {
+      //   redisData = { messages: messageText, lastMessage: new Date() };
+      // }
 
-      await writeKey(id, redisData);
+      // await writeKey(id, redisData);
 
-      setTimeout(async () => {
-        redisData = await findKey(id);
-        if (
-          redisData &&
-          redisData.lastMessage.getTime() < new Date().getTime() - 3999
-        ) {
-          console.log(
-            `debouncing messages done, let's start!`,
-            redisData.messages
-          );
-          deleteKey(id);
-          controllerMessageLevel(user, redisData.messages);
-        }
-      }, 4000);
+      // setTimeout(async () => {
+      //   redisData = await findKey(id);
+      //   if (
+      //     redisData &&
+      //     redisData.lastMessage.getTime() < new Date().getTime() - 3999
+      //   ) {
+      //     console.log(
+      //       `debouncing messages done, let's start!`,
+      //       redisData.messages
+      //     );
+      //     deleteKey(id);
+      //     controllerMessageLevel(user, redisData.messages);
+      //   }
+      // }, 4000);
+      controllerMessageLevel(user, messageText);
     }
 
     // What's App message received
