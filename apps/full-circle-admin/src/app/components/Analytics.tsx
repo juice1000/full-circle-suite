@@ -47,6 +47,7 @@ const Analytics = () => {
   const dailyActiveUsers = getDailyActiveUserRatio(users);
   // console.log('usersToday: ', usersToday);
 
+  const messagesPerDay = averageMessagesPerDay(users);
   return (
     <div className="m-14">
       <main>
@@ -57,7 +58,7 @@ const Analytics = () => {
           </div>
         ) : (
           <div className="my-12">
-            <div className="flex flex-col gap-8 [&>div]:w-56">
+            <div className="2xl:w-3/4 grid grid-cols-3 gap-10 [&>div]:w-56">
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
                 <p>Total Users</p>
                 <h3>{users.length}</h3>
@@ -91,6 +92,10 @@ const Analytics = () => {
                   {Math.floor(activeUsersThisMonth.length / users.length) * 100}
                   %
                 </h3>
+              </div>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
+                <p>Average Message Count / Day</p>
+                <h3> {messagesPerDay}</h3>
               </div>
             </div>
           </div>
@@ -159,7 +164,7 @@ function getDailyActiveUserRatio(users: UserMessages[]) {
     const uniqueDatesThisMonth = [...new Set(datesThisMonth)];
 
     // We check if the user has sent at least 3 messages each day he used the bot
-    const result = messagesPerDayCount(datesThisMonth);
+    const result = isThreeMessagesPerDay(datesThisMonth);
     if (result) return true;
 
     // Then we check if the user has 70% participation rate in the current month
@@ -170,7 +175,39 @@ function getDailyActiveUserRatio(users: UserMessages[]) {
   return filteredUsers;
 }
 
-function messagesPerDayCount(createdDates: string[]): boolean {
+function averageMessagesPerDay(users: UserMessages[]) {
+  const messagesPerDay = users.map((user: UserMessages) => {
+    const messagesCreated = user.messages.map((message: Message) =>
+      message.created.toDateString()
+    );
+
+    const uniqueCreatedDates = [...new Set(messagesCreated)];
+
+    const result = messagesPerDayCount(messagesCreated);
+    return Math.round(
+      result.reduce((acc, curr) => acc + curr, 0) / uniqueCreatedDates.length
+    );
+  });
+  // console.log(messagesPerDay);
+  return Math.round(
+    messagesPerDay.reduce((acc, curr) => acc + curr, 0) / messagesPerDay.length
+  );
+}
+
+function messagesPerDayCount(createdDates: string[]): number[] {
+  const itemCounts = createdDates.reduce((counts, item) => {
+    if (item in counts) {
+      counts[item]++;
+    } else {
+      counts[item] = 1;
+    }
+    return counts;
+  }, {} as Record<string, number>);
+
+  return Object.values(itemCounts);
+}
+
+function isThreeMessagesPerDay(createdDates: string[]): boolean {
   const itemCounts = createdDates.reduce((counts, item) => {
     if (item in counts) {
       counts[item]++;
