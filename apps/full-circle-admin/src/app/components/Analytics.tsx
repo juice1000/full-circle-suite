@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getWeek } from '../../utls';
 import ball_loader from '../../assets/Ball-Loader.gif';
 import Plot from 'react-plotly.js';
+import { Data } from 'plotly.js';
 
 interface UserMessages {
   user: User;
@@ -260,7 +261,7 @@ function getTimeSetupToFirstMessage(users: UserMessages[]) {
 }
 
 function Boxplot({ timeDifferences }: { timeDifferences: number[] }) {
-  const trace = {
+  const trace: Data = {
     x: timeDifferences, // Your data here
     type: 'box',
     name: '',
