@@ -5,12 +5,11 @@ import { ddbDocClient } from './dynamo-db';
 export async function getCurrentGPTModel(): Promise<GPTModel | null> {
   try {
     const params = new ScanCommand({
-      TableName: 'full-circle-gpt-system-prompts',
-      FilterExpression: 'current = :value',
+      TableName: 'full-circle-gpt-models',
+      FilterExpression: 'currentlySelected = :value',
       ExpressionAttributeValues: {
         ':value': true,
       },
-      Limit: 1,
     });
 
     const response = await ddbDocClient.send(params);
@@ -29,7 +28,7 @@ export async function getCurrentGPTModel(): Promise<GPTModel | null> {
       return null;
     }
   } catch (err) {
-    console.log('no current gpt model found');
+    console.log('no current gpt model found', err);
     return null;
   }
 }

@@ -64,7 +64,7 @@ app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
 });
 
 // TODO: this function is still in the making and only for demo purposes
-app.post('/create-user', async (req: Request, res: Response) => {
+app.get('/create-user', async (req: Request, res: Response) => {
   // TODO: create user profile after signup
   console.log('create demo user');
   const userInfo = req.body;
@@ -75,15 +75,15 @@ app.post('/create-user', async (req: Request, res: Response) => {
 
   const user: User = {
     id: uuidv4(),
-    firstname: 'Julien',
-    lastname: 'Look',
+    firstname: 'Grace',
+    lastname: 'Zhu',
     created: new Date(),
     birthdate: new Date('1996-04-25'),
-    phone: '4917643209870',
+    phone: '6583226020',
     email: '',
     numberOfChildren: 2,
     introduction:
-      'Julien is a father and a founder of multiple companies. He believes in the Montessori approach when it comes to raising her kids. He has a 2-year-old son and a 5-year-old daughter. He speaks Singlish.',
+      'Grace is a mother and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. She has a 2-year-old son and a 5-year-old daughter. She speaks Singlish and only wants to converse in Singlish.',
     stressScore: 0,
     exerciseMode: false,
     exerciseName: '',

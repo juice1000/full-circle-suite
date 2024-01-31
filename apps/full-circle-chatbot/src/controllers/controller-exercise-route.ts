@@ -59,19 +59,14 @@ export async function evaluateStressLevel(
   await interpretStressLevel(user, messageText, gptModelId, messageHistory);
   console.log('user stress score: ', user.stressScore);
 
-  // // We check if the last exercise has been
-  // const datePreviousTwoWeeks = new Date(
-  //   new Date().getTime() - 14 * 24 * 60 * 60 * 1000
-  // );
-  if (
-    user.stressScore < -0.8 //&&
-    // user.exerciseLastParticipated < datePreviousTwoWeeks
-  ) {
+  if (user.stressScore < -0.8) {
     // Initiate stress exercise
     user.exerciseMode = true;
     user.exerciseName = 'mental-distress'; // TODO: this exercise should not be hardcoded
     user.exerciseStep = 1; // Always starts at 1, because we automatically trigger the first exercise question
     const exercise = await getExercise(user.exerciseName);
     sendUserMessage(user.phone, exercise.questions[0]);
+  } else {
+    user.exerciseLastParticipated = new Date();
   }
 }
