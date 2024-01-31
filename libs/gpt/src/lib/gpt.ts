@@ -24,6 +24,7 @@ export async function gptChatResponse(
   prompt: string,
   // messageHistory?: Message[],  // TODO: make this work
   // user?: User
+  gptModelId: string,
   messageHistory?: any,
   user?: any
 ) {
@@ -50,7 +51,12 @@ export async function gptChatResponse(
     appendMessageHistory(messageHistory, messages);
   }
 
-  const completion = await executeGPTModel(messages, openaiClient, prompt);
+  const completion = await executeGPTModel(
+    messages,
+    openaiClient,
+    prompt,
+    gptModelId
+  );
 
   // console.log(completion.choices[0].message.content);
   return completion;
@@ -66,6 +72,7 @@ export async function gptChatResponse(
 export async function interpretStressLevel(
   user: any,
   prompt: any,
+  gptModelId: string,
   messageHistory?: any
 ) {
   console.log('\nCalling interpretStressLevel\n');
@@ -85,7 +92,12 @@ export async function interpretStressLevel(
   // console.log('messages we consider for stress level evaluation: ', messages);
 
   //console.log(messages);
-  const scoreCompletion = await executeGPTModel(messages, openaiClient, prompt);
+  const scoreCompletion = await executeGPTModel(
+    messages,
+    openaiClient,
+    prompt,
+    gptModelId
+  );
 
   if (!isNaN(+scoreCompletion)) {
     // check if a score was actually created
@@ -104,7 +116,8 @@ export async function gptExerciseResponse(
   prompt: string,
   messageHistory: any,
   user: any,
-  exercise: any
+  exercise: any,
+  gptModelId: string
 ) {
   // console.log('\nCalling gptExerciseResponse\n');
   const openaiClient = gptSetup();
@@ -140,6 +153,11 @@ export async function gptExerciseResponse(
     }
   }
 
-  const completion = await executeGPTModel(messages, openaiClient, prompt);
+  const completion = await executeGPTModel(
+    messages,
+    openaiClient,
+    prompt,
+    gptModelId
+  );
   return completion;
 }

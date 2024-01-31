@@ -33,6 +33,11 @@ export interface GPTSystemPrompt {
   current: boolean;
 }
 
+export interface GPTModel {
+  id: string;
+  current: boolean;
+}
+
 export interface SelectedTrainingData {
   id: string;
   userId: string;

@@ -3,11 +3,11 @@ import OpenAI from 'openai';
 export async function executeGPTModel(
   messages: any,
   openaiClient: OpenAI,
-  prompt: string
+  prompt: string,
+  gptModelId: string
 ): Promise<string> {
   try {
     // console.log('\nCalling executeGPTModel\n');
-    const gptModel: string = process.env.GPT_MODEL3 || '';
     // This is new user prompt
     const userPrompt = {
       role: 'user',
@@ -17,7 +17,7 @@ export async function executeGPTModel(
 
     const completionsObject = {
       messages: messages as OpenAI.ChatCompletionMessageParam[],
-      model: gptModel,
+      model: gptModelId,
       n: 1,
     };
 

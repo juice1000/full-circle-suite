@@ -66,6 +66,26 @@ export const gptSystemPromptSchema: CreateTableCommandInput = {
   TableName: 'full-circle-gpt-system-prompts',
 };
 
+export const gptModelSchema: CreateTableCommandInput = {
+  AttributeDefinitions: [
+    {
+      AttributeName: 'id',
+      AttributeType: 'S',
+    },
+  ],
+  KeySchema: [
+    {
+      AttributeName: 'id',
+      KeyType: 'HASH',
+    },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
+  },
+  TableName: 'full-circle-gpt-models',
+};
+
 export const selectedTrainingDataSchema: CreateTableCommandInput = {
   AttributeDefinitions: [
     {

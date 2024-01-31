@@ -9,7 +9,8 @@ import { sendUserMessage } from '@libs/whats-app';
 export async function controllerExerciseRoute(
   user: User,
   messageText: string,
-  messageHistory: Message[]
+  messageHistory: Message[],
+  gptModelId: string
 ): Promise<string> {
   // Check when the last exercise has been
   let gptResponse = '';
@@ -26,7 +27,8 @@ export async function controllerExerciseRoute(
       messageText,
       messageHistory,
       user,
-      exercise
+      exercise,
+      gptModelId
     );
     user.exerciseStep += 1;
   } else {
@@ -36,7 +38,12 @@ export async function controllerExerciseRoute(
     user.exerciseName = '';
     user.exerciseStep = 0;
     user.exerciseLastParticipated = new Date();
-    gptResponse = await gptChatResponse(messageText, messageHistory, user);
+    gptResponse = await gptChatResponse(
+      messageText,
+      gptModelId,
+      messageHistory,
+      user
+    );
   }
 
   return gptResponse;
@@ -45,19 +52,20 @@ export async function controllerExerciseRoute(
 export async function evaluateStressLevel(
   user: User,
   messageText: string,
-  messageHistory: Message[]
+  messageHistory: Message[],
+  gptModelId: string
 ) {
   // Elaborate on the stress level
-  await interpretStressLevel(user, messageText, messageHistory);
+  await interpretStressLevel(user, messageText, gptModelId, messageHistory);
   console.log('user stress score: ', user.stressScore);
 
-  // We check if the last exercise has been
-  const datePreviousTwoWeeks = new Date(
-    new Date().getTime() - 14 * 24 * 60 * 60 * 1000
-  );
+  // // We check if the last exercise has been
+  // const datePreviousTwoWeeks = new Date(
+  //   new Date().getTime() - 14 * 24 * 60 * 60 * 1000
+  // );
   if (
-    user.stressScore < -0.8 &&
-    user.exerciseLastParticipated < datePreviousTwoWeeks
+    user.stressScore < -0.8 //&&
+    // user.exerciseLastParticipated < datePreviousTwoWeeks
   ) {
     // Initiate stress exercise
     user.exerciseMode = true;

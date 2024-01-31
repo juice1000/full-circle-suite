@@ -51,7 +51,8 @@ export async function getMessages(
 export async function createMessage(
   userId: string,
   userMessage: string,
-  gptResponse: string
+  gptResponse: string,
+  gptModelId: string
 ) {
   const message: Message = {
     id: uuidv4(),
@@ -59,7 +60,7 @@ export async function createMessage(
     userId: userId,
     userMessage: userMessage,
     gptResponse: gptResponse,
-    gptModel: process.env.GPT_MODEL3 || '',
+    gptModel: gptModelId,
   };
   const putCommand = new PutCommand({
     TableName: 'full-circle-messages',

@@ -4,6 +4,7 @@ import {
   createMessage,
   getMessages,
   Message,
+  getCurrentGPTModel,
 } from '@libs/dynamo-db';
 import { gptChatResponse } from '@libs/gpt';
 import { sendUserMessage } from '@libs/whats-app';
@@ -27,33 +28,50 @@ export async function controllerMessageLevel(user: User, messageText: string) {
   ) {
     console.error('Message has been previously sent to the server');
   } else {
-    // Check if user in exercise mode
-    if (user.exerciseMode) {
-      gptResponse = await controllerExerciseRoute(
-        user,
-        messageText,
-        messageHistory
-      );
+    // Check if current GPT model exists
+    const gptModel = await getCurrentGPTModel();
+    if (!gptModel) {
+      console.error('No GPT model found');
     } else {
-      // Trigger GPT-model with chat history and user data
-      gptResponse = await gptChatResponse(messageText, messageHistory, user);
-    }
-
-    // Store new message Object in DB
-    createMessage(user.id, messageText, gptResponse);
-    // Send message to user
-    sendUserMessage(user.phone, gptResponse);
-
-    if (!user.exerciseMode) {
-      // run this in timely intervals, we don't need to evaluate stress level with every message
-      const oneMonthThreshold = new Date(
-        new Date().getTime() - 30 * 24 * 3600 * 1000
-      );
-      if (oneMonthThreshold > user.exerciseLastParticipated) {
-        await evaluateStressLevel(user, messageText, messageHistory);
+      // Check if user in exercise mode
+      if (user.exerciseMode) {
+        gptResponse = await controllerExerciseRoute(
+          user,
+          messageText,
+          messageHistory,
+          gptModel.id
+        );
+      } else {
+        // Trigger GPT-model with chat history and user data
+        gptResponse = await gptChatResponse(
+          messageText,
+          gptModel.id,
+          messageHistory,
+          user
+        );
       }
+
+      // Store new message Object in DB
+      createMessage(user.id, messageText, gptResponse, gptModel.id);
+      // Send message to user
+      sendUserMessage(user.phone, gptResponse);
+
+      if (!user.exerciseMode) {
+        // run this in timely intervals, we don't need to evaluate stress level with every message
+        const datePreviousTwoWeeks = new Date(
+          new Date().getTime() - 14 * 24 * 60 * 60 * 1000
+        );
+        if (datePreviousTwoWeeks > user.exerciseLastParticipated) {
+          await evaluateStressLevel(
+            user,
+            messageText,
+            messageHistory,
+            gptModel.id
+          );
+        }
+      }
+      // Update User in database
+      writeUser(user);
     }
-    // Update User in database
-    writeUser(user);
   }
 }
