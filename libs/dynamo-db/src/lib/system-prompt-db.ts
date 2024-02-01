@@ -40,17 +40,15 @@ export async function getAllSystemPrompts(): Promise<GPTSystemPrompt[] | null> {
   }
 }
 
-export async function getSystemPrompt(
-  current: boolean
-): Promise<GPTSystemPrompt | null> {
+export async function getCurrentSystemPrompt(): Promise<GPTSystemPrompt | null> {
   try {
     const params = new ScanCommand({
       TableName: 'full-circle-gpt-system-prompts',
       FilterExpression: 'current = :value',
       ExpressionAttributeValues: {
-        ':value': current,
+        ':value': true,
       },
-      Limit: 1,
+      // Limit: 1,
     });
 
     const response = await ddbDocClient.send(params);
@@ -94,7 +92,7 @@ export async function setCurrentPrompt(id: string) {
 }
 export async function unsetCurrentPrompt() {
   // const ddbDocClient = DynamoDBDocumentClient.from(dbClient);
-  const currentPrompt = await getSystemPrompt(true);
+  const currentPrompt = await getCurrentSystemPrompt();
   if (currentPrompt) {
     const command = new UpdateCommand({
       TableName: 'full-circle-gpt-system-prompts',
@@ -120,14 +118,14 @@ export async function writeSystemPrompt(prompt: string) {
     current: true,
   };
 
-  await unsetCurrentPrompt();
+  //await unsetCurrentPrompt();
 
   const putCommand = new PutCommand({
-    TableName: 'full-circle-guided-exercises',
+    TableName: 'full-circle-gpt-system-prompts',
     Item: {
       id: systemPrompt.id,
       prompt: systemPrompt.prompt,
-      created: systemPrompt.created.getTime(),
+      created: systemPrompt.created.toISOString(),
       current: systemPrompt.current,
     },
   });

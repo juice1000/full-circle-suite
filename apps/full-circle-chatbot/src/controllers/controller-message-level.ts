@@ -5,6 +5,7 @@ import {
   getMessages,
   Message,
   getCurrentGPTModel,
+  getCurrentSystemPrompt,
 } from '@libs/dynamo-db';
 import { gptChatResponse } from '@libs/gpt';
 import { sendUserMessage } from '@libs/whats-app';
@@ -30,8 +31,9 @@ export async function controllerMessageLevel(user: User, messageText: string) {
   } else {
     // Check if current GPT model exists
     const gptModel = await getCurrentGPTModel();
-    if (!gptModel) {
-      console.error('No GPT model found');
+    const currentSystemPrompt = await getCurrentSystemPrompt();
+    if (!gptModel || !currentSystemPrompt) {
+      console.error('No GPT model or current System Prompt found');
     } else {
       // Check if user in exercise mode
       if (user.exerciseMode) {
@@ -39,13 +41,15 @@ export async function controllerMessageLevel(user: User, messageText: string) {
           user,
           messageText,
           messageHistory,
-          gptModel.id
+          gptModel.id,
+          currentSystemPrompt.prompt
         );
       } else {
         // Trigger GPT-model with chat history and user data
         gptResponse = await gptChatResponse(
           messageText,
           gptModel.id,
+          currentSystemPrompt.prompt,
           messageHistory,
           user
         );

@@ -2,7 +2,6 @@
 import {
   generateUserInfo,
   appendMessageHistory,
-  systemPrompt,
   exerciseUtilSystemPrompt,
   appendMessageHistoryStressLevel,
 } from './utils';
@@ -25,6 +24,7 @@ export async function gptChatResponse(
   // messageHistory?: Message[],  // TODO: make this work
   // user?: User
   gptModelId: string,
+  systemPrompt: string,
   messageHistory?: any,
   user?: any
 ) {
@@ -117,7 +117,8 @@ export async function gptExerciseResponse(
   messageHistory: any,
   user: any,
   exercise: any,
-  gptModelId: string
+  gptModelId: string,
+  systemPrompt: string
 ) {
   // console.log('\nCalling gptExerciseResponse\n');
   const openaiClient = gptSetup();

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import { messageProcessor } from './controllers/controller-whatsapp';
 import { v4 as uuidv4 } from 'uuid';
-import { extractSignupUserInformation } from '@libs/dynamo-db';
+import { writeSystemPrompt } from '@libs/dynamo-db';
 
 // ***************************************** NX LIBRARIES ***************************************
 
@@ -15,6 +15,7 @@ import {
 } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
+import { exampleSystemPrompt } from '@libs/gpt';
 
 // deleteTables();
 initializeDB();
@@ -123,5 +124,13 @@ app.get('/create-exercise', async (req, res) => {
     console.error('exercise already exists');
   }
 
+  res.sendStatus(200);
+});
+
+app.get('/create-system-prompt', async (req, res) => {
+  // TODO: create system prompts through admin panel
+  console.log('create system prompt');
+  const prompt = exampleSystemPrompt;
+  await writeSystemPrompt(prompt);
   res.sendStatus(200);
 });

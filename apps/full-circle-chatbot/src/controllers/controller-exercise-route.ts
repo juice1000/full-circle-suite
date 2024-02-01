@@ -10,7 +10,8 @@ export async function controllerExerciseRoute(
   user: User,
   messageText: string,
   messageHistory: Message[],
-  gptModelId: string
+  gptModelId: string,
+  systemPrompt: string
 ): Promise<string> {
   // Check when the last exercise has been
   let gptResponse = '';
@@ -28,7 +29,8 @@ export async function controllerExerciseRoute(
       messageHistory,
       user,
       exercise,
-      gptModelId
+      gptModelId,
+      systemPrompt
     );
     user.exerciseStep += 1;
   } else {
@@ -41,6 +43,7 @@ export async function controllerExerciseRoute(
     gptResponse = await gptChatResponse(
       messageText,
       gptModelId,
+      systemPrompt,
       messageHistory,
       user
     );
