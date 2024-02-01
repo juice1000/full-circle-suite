@@ -81,7 +81,7 @@ export async function setCurrentPrompt(id: string) {
     Key: {
       id: id,
     },
-    UpdateExpression: 'set current = :val',
+    UpdateExpression: 'set currentlySelected = :val',
     ExpressionAttributeValues: {
       ':val': true,
     },
@@ -99,7 +99,7 @@ export async function unsetCurrentPrompt() {
       Key: {
         id: currentPrompt.id,
       },
-      UpdateExpression: 'set current = :val',
+      UpdateExpression: 'set currentlySelected = :val',
       ExpressionAttributeValues: {
         ':val': false,
       },
@@ -126,7 +126,7 @@ export async function writeSystemPrompt(prompt: string) {
       id: systemPrompt.id,
       prompt: systemPrompt.prompt,
       created: systemPrompt.created.toISOString(),
-      current: systemPrompt.currentlySelected,
+      currentlySelected: systemPrompt.currentlySelected,
     },
   });
   await ddbDocClient.send(putCommand);
