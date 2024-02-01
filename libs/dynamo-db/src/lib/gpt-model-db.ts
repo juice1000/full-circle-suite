@@ -19,7 +19,7 @@ export async function getCurrentGPTModel(): Promise<GPTModel | null> {
 
       const gptModel: GPTModel = {
         id: item.id,
-        current: true,
+        currentlySelected: true,
       };
 
       return gptModel;

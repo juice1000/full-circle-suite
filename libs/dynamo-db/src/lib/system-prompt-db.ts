@@ -24,7 +24,7 @@ export async function getAllSystemPrompts(): Promise<GPTSystemPrompt[] | null> {
           id: item.id,
           created: new Date(item.created),
           prompt: item.prompt,
-          current: item.current,
+          currentlySelected: item.currentlySelected,
         };
         prompts.push(prompt);
       });
@@ -44,7 +44,7 @@ export async function getCurrentSystemPrompt(): Promise<GPTSystemPrompt | null> 
   try {
     const params = new ScanCommand({
       TableName: 'full-circle-gpt-system-prompts',
-      FilterExpression: 'current = :value',
+      FilterExpression: 'currentlySelected = :value',
       ExpressionAttributeValues: {
         ':value': true,
       },
@@ -60,7 +60,7 @@ export async function getCurrentSystemPrompt(): Promise<GPTSystemPrompt | null> 
         id: item.id,
         created: new Date(item.created),
         prompt: item.prompt,
-        current: true,
+        currentlySelected: true,
       };
 
       return systemPrompt;
@@ -115,7 +115,7 @@ export async function writeSystemPrompt(prompt: string) {
     id: uuidv4(),
     created: new Date(),
     prompt: prompt,
-    current: true,
+    currentlySelected: true,
   };
 
   //await unsetCurrentPrompt();
@@ -126,7 +126,7 @@ export async function writeSystemPrompt(prompt: string) {
       id: systemPrompt.id,
       prompt: systemPrompt.prompt,
       created: systemPrompt.created.toISOString(),
-      current: systemPrompt.current,
+      current: systemPrompt.currentlySelected,
     },
   });
   await ddbDocClient.send(putCommand);
@@ -146,7 +146,7 @@ export async function updatePrompt(prompt: GPTSystemPrompt) {
     UpdateExpression: 'set prompt = :val1, current = :val2',
     ExpressionAttributeValues: {
       ':val1': prompt.prompt,
-      ':val2': prompt.current,
+      ':val2': prompt.currentlySelected,
     },
   });
 

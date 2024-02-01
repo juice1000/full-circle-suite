@@ -30,12 +30,12 @@ export interface GPTSystemPrompt {
   id: string;
   created: Date;
   prompt: string;
-  current: boolean;
+  currentlySelected: boolean;
 }
 
 export interface GPTModel {
   id: string;
-  current: boolean;
+  currentlySelected: boolean;
 }
 
 export interface SelectedTrainingData {
