@@ -36,7 +36,9 @@ export async function getUser(phone: string): Promise<User | null> {
         exerciseStep: item.exerciseStep,
         exerciseLastParticipated: new Date(item.exerciseLastParticipated),
         subscriptionStartDate: new Date(item.subscriptionStartDate),
-        subscriptionEndDate: new Date(item.subscriptionEndDate),
+        subscriptionEndDate: item.subscriptionEndDate
+          ? new Date(item.subscriptionEndDate)
+          : null,
       };
       // console.log(user);
 
