@@ -17,10 +17,18 @@ export interface User {
   subscriptionEndDate: Date | null;
   firstname: string;
   lastname?: string;
+  role?: string;
+  archeType?: string;
+  parentingConcerns?: string;
+  infantFirstName?: string;
+  infantBirtdate?: string;
+  infantCharacteristics?: string;
+
   email?: string;
   birthdate: Date;
   numberOfChildren?: number;
   introduction?: string;
+  initialIntroduction: string;
   exerciseName?: string;
   exerciseStep?: number;
   exerciseLastParticipated: Date;

@@ -44,8 +44,8 @@ export async function controllerExerciseRoute(
       messageText,
       gptModelId,
       systemPrompt,
-      messageHistory,
-      user
+      user,
+      messageHistory
     );
   }
 

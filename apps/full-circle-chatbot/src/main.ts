@@ -2,7 +2,10 @@ import express, { Request, Response } from 'express';
 import session from 'express-session';
 import { messageProcessor } from './controllers/controller-whatsapp';
 import { v4 as uuidv4 } from 'uuid';
-import { writeSystemPrompt } from '@libs/dynamo-db';
+import {
+  extractSignupUserInformation,
+  writeSystemPrompt,
+} from '@libs/dynamo-db';
 
 // ***************************************** NX LIBRARIES ***************************************
 
@@ -65,27 +68,45 @@ app.post('/whatsapp-webhook', async (req: Request, res: Response) => {
 });
 
 // TODO: this function is still in the making and only for demo purposes
-app.get('/create-user', async (req: Request, res: Response) => {
+app.post('/create-user', async (req: Request, res: Response) => {
   // TODO: create user profile after signup
-  console.log('create demo user');
+  console.log('create user');
   const userInfo = req.body;
   // console.log(userInfo);
-  // if (userInfo) {
-  //   extractSignupUserInformation(userInfo.form_response);
-  // }
+  if (userInfo) {
+    const user = extractSignupUserInformation(userInfo.form_response);
+    console.log(user);
+    await createUser(user);
+  }
+
+  res.sendStatus(200);
+});
+
+// TODO: this function is still in the making and only for demo purposes
+app.get('/create-demo-user', async (req: Request, res: Response) => {
+  // TODO: create user profile after signup
+  console.log('create demo user');
 
   const user: User = {
     id: uuidv4(),
     firstname: 'Grace',
     lastname: 'Zhu',
-    created: new Date(),
+    role: 'mother',
     birthdate: new Date('1996-04-25'),
+    created: new Date(),
+    archeType: 'hard-working',
     phone: '6583226020',
     email: '',
     numberOfChildren: 2,
-    introduction:
-      'Grace is a mother and a founder of multiple companies. She believes in the Montessori approach when it comes to raising her kids. She has a 2-year-old son and a 5-year-old daughter. She speaks Singlish and only wants to converse in Singlish.',
-    stressScore: 0,
+    stressScore: 2,
+    parentingConcerns: 'sleep, freetime',
+
+    infantFirstName: 'Bubu',
+    infantBirtdate: '',
+    infantCharacteristics: 'anxious, distracted',
+
+    introduction: '',
+    initialIntroduction: '',
     exerciseMode: false,
     exerciseName: '',
     exerciseStep: 0,

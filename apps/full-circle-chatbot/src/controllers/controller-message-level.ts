@@ -50,8 +50,8 @@ export async function controllerMessageLevel(user: User, messageText: string) {
           messageText,
           gptModel.id,
           currentSystemPrompt.prompt,
-          messageHistory,
-          user
+          user,
+          messageHistory
         );
       }
 

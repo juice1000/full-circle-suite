@@ -25,20 +25,20 @@ export async function gptChatResponse(
   // user?: User
   gptModelId: string,
   systemPrompt: string,
-  messageHistory?: any,
-  user?: any
+  user: any,
+  messageHistory?: any
 ) {
   // console.log('\nCalling gptChatResponse\n');
   const openaiClient: OpenAI = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;
-  if (user) {
-    const userPrompt = generateUserInfo(user);
-    if (userPrompt.length > 0) {
-      //console.log(userPrompt);
-      scopedSystemPrompt = scopedSystemPrompt + '\n\n' + userPrompt;
-    }
+  let userPrompt = user.introduction;
+  //const userPrompt = generateUserInfo(user);
+  if (!messageHistory) {
+    userPrompt = user.initialIntroduction;
   }
+
+  scopedSystemPrompt = scopedSystemPrompt + '\n\n' + userPrompt;
 
   // We feed this to the GPT prompt
   const messages = [

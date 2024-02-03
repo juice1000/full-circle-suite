@@ -18,7 +18,6 @@ export async function getUser(phone: string): Promise<User | null> {
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
-      // console.log(item);
 
       const user: User = {
         id: item.id,
@@ -26,11 +25,18 @@ export async function getUser(phone: string): Promise<User | null> {
         firstname: item.firstname,
         lastname: item.lastname,
         birthdate: new Date(item.birthdate),
+        role: item.role,
+        archeType: item.archeType,
+        parentingConcerns: item.parentingConcerns,
+        infantFirstName: item.infantFirstName,
+        infantBirtdate: item.infantBirtdate,
+        infantCharacteristics: item.infantCharacteristics,
         phone: item.phone,
         stressScore: item.stressScore,
         email: item.email,
         numberOfChildren: item.numberOfChildren,
         introduction: item.introduction,
+        initialIntroduction: item.initialIntroduction,
         exerciseMode: item.exerciseMode,
         exerciseName: item.exerciseName,
         exerciseStep: item.exerciseStep,
@@ -40,7 +46,6 @@ export async function getUser(phone: string): Promise<User | null> {
           ? new Date(item.subscriptionEndDate)
           : null,
       };
-      // console.log(user);
 
       return user;
     } else {
