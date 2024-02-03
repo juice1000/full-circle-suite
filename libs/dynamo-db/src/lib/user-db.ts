@@ -63,7 +63,7 @@ export async function writeUser(user: User) {
   const convertedUser = {
     ...user,
     created: user.created.toISOString(),
-    birthdate: user.birthdate.toISOString(),
+    birthdate: user.birthdate ? user.birthdate.toISOString() : null,
     exerciseLastParticipated: user.exerciseLastParticipated.toISOString(),
     subscriptionStartDate: user.subscriptionStartDate.toISOString(),
     subscriptionEndDate: user.subscriptionEndDate

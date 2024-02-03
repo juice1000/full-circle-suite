@@ -130,6 +130,7 @@ export function extractSignupUserInformation(formData: any) {
 
   user.introduction = craftUserIntroduction(user);
   user.initialIntroduction = craftInitialIntroduction(user);
+  // console.log('new user', user);
 
   return user;
 }
