@@ -20,10 +20,7 @@ export interface User {
   role?: string;
   archeType?: string;
   parentingConcerns?: string;
-  infantFirstName?: string;
-  infantBirtdate?: string;
-  infantCharacteristics?: string;
-
+  children: Child[];
   email?: string;
   birthdate: Date;
   numberOfChildren?: number;
@@ -32,6 +29,12 @@ export interface User {
   exerciseName?: string;
   exerciseStep?: number;
   exerciseLastParticipated: Date;
+}
+
+export interface Child {
+  name: string;
+  birthdate: Date;
+  sensitivity: string;
 }
 
 export interface GPTSystemPrompt {

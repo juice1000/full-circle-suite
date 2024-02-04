@@ -33,7 +33,6 @@ export async function gptChatResponse(
 
   let scopedSystemPrompt = systemPrompt;
   let userPrompt = user.introduction;
-  //const userPrompt = generateUserInfo(user);
   if (!messageHistory) {
     userPrompt = user.initialIntroduction;
   }

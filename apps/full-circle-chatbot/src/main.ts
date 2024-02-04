@@ -75,7 +75,7 @@ app.post('/create-user', async (req: Request, res: Response) => {
   // console.log(userInfo);
   if (userInfo) {
     const user = extractSignupUserInformation(userInfo.form_response);
-    console.log(user);
+    console.log('new user', user);
     await createUser(user);
   }
 
@@ -101,9 +101,7 @@ app.get('/create-demo-user', async (req: Request, res: Response) => {
     stressScore: 2,
     parentingConcerns: 'sleep, freetime',
 
-    infantFirstName: 'Bubu',
-    infantBirtdate: '',
-    infantCharacteristics: 'anxious, distracted',
+    children: [],
 
     introduction: '',
     initialIntroduction: '',

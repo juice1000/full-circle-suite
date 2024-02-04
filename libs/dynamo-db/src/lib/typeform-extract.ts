@@ -1,4 +1,4 @@
-import { User } from './db-types';
+import { User, Child } from './db-types';
 import { v4 as uuidv4 } from 'uuid';
 
 export function extractSignupUserInformation(formData: any) {
@@ -35,6 +35,7 @@ export function extractSignupUserInformation(formData: any) {
     }
     const qa = {
       id: id,
+      ref: field.ref,
       question: field.title,
       answer: answerContent,
     };
@@ -61,11 +62,16 @@ export function extractSignupUserInformation(formData: any) {
     evaluationArray.push(evaluation);
   }
 
-  // console.log('evaluationArray', evaluationArray);
-  // console.log('qaArray', qaArray);
+  console.log('evaluationArray', evaluationArray);
+  console.log('qaArray', qaArray);
 
-  const firstNameField = qaArray.find((qa) => qa.id === 'cycC1n2TmlnU');
-  const roleField = qaArray.find((qa) => qa.id === '8QkRAFm3vff2');
+  // TODO: these fields are sensitive to the form used and won't function with another form without modification
+  // const firstNameField = qaArray.find((qa) => qa.id === 'cycC1n2TmlnU');
+  // const roleField = qaArray.find((qa) => qa.id === '8QkRAFm3vff2');
+  // const parentingConcerns = qaArray.find((qa) => qa.id === '8xeA5FgsrOLC');
+  const firstNameField = qaArray.find((qa) => qa.id === 'RMuK1snn8jz7');
+  const roleField = qaArray.find((qa) => qa.id === 'BotXRIB1uqMF');
+  const parentingConcerns = qaArray.find((qa) => qa.id === 't2R2WzkcDfBd');
   const numberOfChildrenField = evaluationArray.find(
     (evaluation) => evaluation.key === 'numberofchildren'
   );
@@ -80,13 +86,10 @@ export function extractSignupUserInformation(formData: any) {
   const stressScore = evaluationArray.find(
     (evaluation) => evaluation.key === 'stressmanagement'
   );
-  const parentingConcerns = qaArray.find((qa) => qa.id === '8xeA5FgsrOLC');
 
-  const infantFirstNameField = qaArray.find((qa) => qa.id === '8RIU2RHce1CX');
-  const infantBirtdateFiled = qaArray.find((qa) => qa.id === 'cy1fPamxv3pf');
-  const infantCharacteristicsField = qaArray.find(
-    (qa) => qa.id === 'ONzwl2CrfZnF'
-  );
+  // We extract the names
+  const extractedBabies = extractBabies(qaArray);
+
   // console.log('firstNameField', firstNameField.answer);
   // console.log('roleField', roleField.answer);
   // console.log('numberOfChildrenField', numberOfChildrenField.value);
@@ -113,9 +116,7 @@ export function extractSignupUserInformation(formData: any) {
     stressScore: stressScore.value,
     parentingConcerns: parentingConcerns.answer,
 
-    infantFirstName: infantFirstNameField.answer,
-    infantBirtdate: infantBirtdateFiled.answer,
-    infantCharacteristics: infantCharacteristicsField.answer,
+    children: extractedBabies,
 
     introduction: '',
     initialIntroduction: '',
@@ -135,11 +136,77 @@ export function extractSignupUserInformation(formData: any) {
   return user;
 }
 
+function extractBabies(qaArray: any): Child[] {
+  const babyRegex = new RegExp('first name', 'i');
+  const babies = qaArray.filter((qa) => qa.question.match(babyRegex));
+
+  const extractedBabies = [];
+  babies.forEach((baby) => {
+    // We search for all fields that contain the reference in the question
+    const ref = baby.ref;
+
+    const babyFields = qaArray.filter((qa) => qa.question.includes(ref));
+
+    // We create a baby object that has all the referenced fields
+    let babyObject;
+    if (babyFields.length === 1) {
+      babyObject = {
+        name: baby.answer,
+        birthdate: new Date(),
+        sensitivity: babyFields[0].answer,
+      };
+      babyObject.birthdate.setFullYear(babyObject.birthdate.getFullYear() - 1);
+    } else {
+      babyObject = {
+        name: baby.answer,
+        birthdate: new Date(babyFields[0].answer),
+        sensitivity: babyFields[1].answer,
+      };
+    }
+    extractedBabies.push(babyObject);
+  });
+  return extractedBabies;
+}
+
+function getArchetypePrompt(archeType: string, userName: string): string {
+  const archetypePrompt = `The following describes the archetype of the ${userName}: `;
+  if (archeType === 'hard-working') {
+    return '';
+  } else if (archeType === 'mindful-mentor') {
+    return (
+      archetypePrompt +
+      'The Mindful Mentor: Respond in a way that prioritises mindful parenting and developing emotional intelligence.'
+    );
+  } else if (archeType === 'Time-Strapped Inquirer') {
+    return (
+      archetypePrompt +
+      'The Time-Strapped Inquirer: “Respond in a way that prioritises time-saving parenting tips.'
+    );
+  } else if (archeType === 'The Traditionalist Explorer') {
+    return (
+      archetypePrompt +
+      "The Traditionalist Explorer: “Respond in a way that xyz (haven't figured it out exactly)."
+    );
+  } else {
+    return '';
+  }
+}
+
 function craftUserIntroduction(user: User) {
-  const childSensitivityExplanation = `${user.infantFirstName}'s sensitivity level towards lights, sounds & textures is on a scale of 1-5 (1 being the least sensitive and 5 being the most sensitive) at ${user.infantCharacteristics}`;
+  let childSensitivityExplanation = `${user.firstname} has ${user.numberOfChildren} children. They will be introduced in the following paragraph:\n`;
+  user.children.forEach((child) => {
+    childSensitivityExplanation += `${
+      child.name
+    } was born on ${child.birthdate.toDateString()}. `;
+  });
+  childSensitivityExplanation += `Next, we evaluate their sensitivity levels towards lights, sounds & textures on a scale of 1-5 (1 being the least sensitive and 5 being the most sensitive):\n`;
+  user.children.forEach((child) => {
+    childSensitivityExplanation += `${child.name}'s sensitivity level is at ${child.sensitivity}. `;
+  });
 
-  const userIntroduction = `The user's name is ${user.firstname}. The user is a ${user.role} to ${user.numberOfChildren} children. ${user.firstname}'s parental archetype is a ${user.archeType}. The infant's name is ${user.infantFirstName} and was born this year. ${childSensitivityExplanation}`;
-
+  let userIntroduction = `The user's name is ${user.firstname}. The user is a ${user.role} to ${user.numberOfChildren} children.\n`;
+  userIntroduction += getArchetypePrompt(user.archeType, user.firstname);
+  userIntroduction += childSensitivityExplanation;
   return userIntroduction;
 }
 

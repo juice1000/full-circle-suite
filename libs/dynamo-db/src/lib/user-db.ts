@@ -28,9 +28,7 @@ export async function getUser(phone: string): Promise<User | null> {
         role: item.role,
         archeType: item.archeType,
         parentingConcerns: item.parentingConcerns,
-        infantFirstName: item.infantFirstName,
-        infantBirtdate: item.infantBirtdate,
-        infantCharacteristics: item.infantCharacteristics,
+        children: JSON.parse(item.children),
         phone: item.phone,
         stressScore: item.stressScore,
         email: item.email,
@@ -69,6 +67,7 @@ export async function writeUser(user: User) {
     subscriptionEndDate: user.subscriptionEndDate
       ? user.subscriptionEndDate.toISOString()
       : null,
+    children: JSON.stringify(user.children),
   };
 
   const putCommand = new PutCommand({
