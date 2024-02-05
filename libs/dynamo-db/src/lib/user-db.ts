@@ -18,7 +18,6 @@ export async function getUser(phone: string): Promise<User | null> {
 
     if (response.Items && response.Items.length > 0) {
       const item = response.Items[0];
-
       const user: User = {
         id: item.id,
         created: new Date(item.created),
@@ -28,7 +27,7 @@ export async function getUser(phone: string): Promise<User | null> {
         role: item.role,
         archeType: item.archeType,
         parentingConcerns: item.parentingConcerns,
-        children: JSON.parse(item.children),
+        children: item.children ? JSON.parse(item.children) : [],
         phone: item.phone,
         stressScore: item.stressScore,
         email: item.email,
