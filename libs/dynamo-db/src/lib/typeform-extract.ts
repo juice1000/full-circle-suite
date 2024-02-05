@@ -170,22 +170,20 @@ function extractBabies(qaArray: any): Child[] {
 
 function getArchetypePrompt(archeType: string, userName: string): string {
   const archetypePrompt = `The following describes the archetype of the ${userName}: `;
-  if (archeType === 'hard-working') {
-    return '';
-  } else if (archeType === 'mindful-mentor') {
+  if (archeType === 'Mindful Mentor') {
     return (
       archetypePrompt +
-      'The Mindful Mentor: Respond in a way that prioritises mindful parenting and developing emotional intelligence.'
+      'The Mindful Mentor: Focus on mindfulness and emotional intelligence, guiding open communication and active listening. Share strategies for positive reinforcement and empathy, embedding mindfulness in daily parenting to enhance the parent-child bond and support emotional growth.'
     );
   } else if (archeType === 'Time-Strapped Inquirer') {
     return (
       archetypePrompt +
-      'The Time-Strapped Inquirer: “Respond in a way that prioritises time-saving parenting tips.'
+      'The Time-Strapped Inquirer: Provide quick, evidence-based parenting tips suited for busy schedules. Emphasize quality time, efficient respectful parenting strategies, and setting realistic goals to foster positive relationships and self-care amidst a hectic lifestyle.'
     );
-  } else if (archeType === 'The Traditionalist Explorer') {
+  } else if (archeType === 'Traditionalist') {
     return (
       archetypePrompt +
-      "The Traditionalist Explorer: “Respond in a way that xyz (haven't figured it out exactly)."
+      'The Traditionalist Explorer: Merge traditional wisdom with modern, evidence-based parenting, emphasizing respect, empathy, and child autonomy. Provide tips for integrating respectful practices with cultural and family values, facilitating open dialogue with elders and community figures. Aim to enrich traditional approaches, ensuring a nurturing environment that values heritage while promoting child development.'
     );
   } else {
     return '';
@@ -193,13 +191,13 @@ function getArchetypePrompt(archeType: string, userName: string): string {
 }
 
 function craftUserIntroduction(user: User) {
-  let childSensitivityExplanation = `${user.firstname} has ${user.numberOfChildren} children. They will be introduced in the following paragraph:\n`;
+  let childSensitivityExplanation = `\nThe children will be introduced in the following paragraph:\n`;
   user.children.forEach((child) => {
     childSensitivityExplanation += `${
       child.name
     } was born on ${child.birthdate.toDateString()}. `;
   });
-  childSensitivityExplanation += `Next, we evaluate their sensitivity levels towards lights, sounds & textures on a scale of 1-5 (1 being the least sensitive and 5 being the most sensitive):\n`;
+  childSensitivityExplanation += `\nNext, we evaluate the children's sensitivity levels towards lights, sounds & textures on a scale of 1-5 (1 being the least sensitive and 5 being the most sensitive):\n`;
   user.children.forEach((child) => {
     childSensitivityExplanation += `${child.name}'s sensitivity level is at ${child.sensitivity}. `;
   });

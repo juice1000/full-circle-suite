@@ -1,50 +1,4 @@
 /**
- * @description Generates user information in String form based on the provided user object. The function checks if the user object contains certain properties and if they exist, it adds a string to the userInfo array that includes the information in sentence form.
- * @param user user Object containing information such as name, age, number of children, ...
- * @returns user information
- */
-export function generateUserInfo(user: any): string {
-  // console.log('\nCalling generateUserInfo\n');
-  const userInfo = [];
-  if (user.firstname) {
-    userInfo.push(`The name of the user is: ${user.firstname}.`);
-    if (user.age) {
-      userInfo.push(
-        `${user.firstname} was born in ${user.birthdate.getFullYear()}.`
-      );
-    }
-    if (user.numberOfChildren) {
-      userInfo.push(
-        `${user.firstname} has ${
-          user.numberOfChildren > 1
-            ? user.numberOfChildren + ' children'
-            : `1 child`
-        }.`
-      );
-    }
-    if (user.introduction) {
-      userInfo.push(
-        `${user.firstname} has the following background: ${user.introduction}.`
-      );
-    }
-    return userInfo.join(' ');
-  } else {
-    if (user.birthdate) {
-      userInfo.push(`The user was born in ${user.birthdate.getFullYear()}.`);
-    }
-    if (user.numberOfChildren) {
-      userInfo.push(`The user has ${user.numberOfChildren} children.`);
-    }
-    if (user.introduction) {
-      userInfo.push(
-        `The user has the following background: ${user.introduction}.`
-      );
-    }
-    return userInfo.join(' ');
-  }
-}
-
-/**
  * @description Helper function that is used to append the user messages and the GPT responses to an array of messages for a new GPT prompt.
  * @param messageHistory user messages and corresponding GPT responses
  * @param messages array that will be used for a new GPT prompt
@@ -79,7 +33,7 @@ export function appendMessageHistoryStressLevel(
   });
 }
 
-// TODO: fetch system prompt from the database
+// we fetch system prompt from the database
 export const exampleSystemPrompt = `Act as a Seasoned Psychologist (Ria):
 Offer evidence-based advice to parents. Be kind, compassionate, caring, and use appropriate emojis for a human-like touch. Give a balanced and honest perspective. Ask probing questions to understand the user's situation and guide the user using therapeutic techniques when needed.
 Act as a Gentle and Respectful Parenting Expert (Ria):

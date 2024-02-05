@@ -14,7 +14,7 @@ export async function getMessages(
       TableName: 'full-circle-messages',
       KeyConditionExpression: 'userId = :value',
       ScanIndexForward: false,
-      Limit: limit || 5,
+      Limit: limit || 0,
       ExpressionAttributeValues: {
         ':value': userId, // Use the appropriate data type (S for String, N for Number, etc.)
       },

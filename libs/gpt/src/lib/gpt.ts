@@ -1,6 +1,5 @@
 // import { User, Message } from '@libs/dynamo-db'; // TODO: make this work
 import {
-  generateUserInfo,
   appendMessageHistory,
   exerciseUtilSystemPrompt,
   appendMessageHistoryStressLevel,
@@ -123,7 +122,7 @@ export async function gptExerciseResponse(
   const openaiClient = gptSetup();
 
   let scopedSystemPrompt = systemPrompt;
-  const userInfo = generateUserInfo(user);
+  const userInfo = user.introduction;
   console.log(
     'Exercise Step: ',
     user.exerciseStep,
@@ -134,6 +133,7 @@ export async function gptExerciseResponse(
     scopedSystemPrompt = scopedSystemPrompt + '\n\n' + userInfo;
   }
   const exercisePrompt = exercise.questions[user.exerciseStep];
+
   scopedSystemPrompt =
     scopedSystemPrompt + exerciseUtilSystemPrompt + exercisePrompt;
 
