@@ -62,7 +62,7 @@ export async function evaluateStressLevel(
   await interpretStressLevel(user, messageText, gptModelId, messageHistory);
   console.log('user stress score: ', user.stressScore);
 
-  if (user.stressScore < -0.8) {
+  if (user.stressScore >= 4) {
     // Initiate stress exercise
     user.exerciseMode = true;
     user.exerciseName = 'mental-distress'; // TODO: this exercise should not be hardcoded
