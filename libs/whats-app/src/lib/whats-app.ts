@@ -39,7 +39,6 @@ export async function whatsAppRetreiveMessage(req: Request) {
       body_param.entry[0].changes[0].value &&
       body_param.entry[0].changes[0].value.messages
     ) {
-      //console.log(body_param.entry[0].changes[0].value.messages[0].text.body);
       return body_param.entry[0].changes[0].value.messages[0];
     } else {
       return null;

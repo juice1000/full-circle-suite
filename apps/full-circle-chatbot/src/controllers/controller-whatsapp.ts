@@ -11,7 +11,6 @@ export async function messageProcessor(req: Request, res: Response) {
 
   if (message) {
     const phone = message.from;
-    const messageText = message.text.body;
 
     // Retrieve user profile
     const user = await getUser(phone);
@@ -36,20 +35,28 @@ export async function messageProcessor(req: Request, res: Response) {
         phone,
         `Hello, your subscription seems to have expired. Please renew your subscription up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.`
       );
+    } else if (message.type !== 'text') {
+      sendUserMessage(
+        phone,
+        `Sorry, I can't receive images or voice messages yet - but I will be able to one day! Send me a text message instead?`
+      );
+    } else if (message.text.body || message.text.body.length > 200) {
+      sendUserMessage(
+        phone,
+        `Sorry, I'd love to hear from you but could you shorten that message to less than 200 words? Thank you!`
+      );
     } else {
+      const messageText = message.text.body;
       // debouncing message input
       // const id = user.id;
       // let redisData = await findKey(id);
-
       // if (redisData) {
       //   redisData.messages += `\n${messageText}`;
       //   redisData.lastMessage = new Date();
       // } else {
       //   redisData = { messages: messageText, lastMessage: new Date() };
       // }
-
       // await writeKey(id, redisData);
-
       // setTimeout(async () => {
       //   redisData = await findKey(id);
       //   if (
