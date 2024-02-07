@@ -40,7 +40,7 @@ export async function messageProcessor(req: Request, res: Response) {
         phone,
         `Sorry, I can't receive images or voice messages yet - but I will be able to one day! Send me a text message instead?`
       );
-    } else if (message.text.body && message.text.body.length > 200) {
+    } else if (message.text.body && message.text.body.length > 1000) {
       sendUserMessage(
         phone,
         `Sorry, I'd love to hear from you but could you shorten that message to less than 200 words? Thank you!`
