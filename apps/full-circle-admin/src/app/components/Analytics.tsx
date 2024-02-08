@@ -68,8 +68,8 @@ const Analytics = () => {
         ) : (
           <div className="my-12">
             <div className="2xl:w-3/4 grid grid-cols-3 gap-10 [&>div]:w-56">
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
-                <p>Total Users</p>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
+                <p>Total Registered Users</p>
                 <h3>{users.length}</h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
@@ -79,36 +79,44 @@ const Analytics = () => {
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Active Users</p>
                 <p className="text-xs">(interacted with the Chatbot)</p>
-                <h3> {usersThatSentMessages.length}</h3>
+                <h3>{usersThatSentMessages.length}</h3>
               </div>
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
-                <p>Total Users Today</p>
-                <h3> {usersToday.length}</h3>
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
+                <p>Users Today</p>
+                <p className="text-xs">(interacted with the Chatbot)</p>
+                <h3>{usersToday.length}</h3>
               </div>
 
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Users This Week</p>
+                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
                   {' '}
                   {Math.floor(activeUsersThisWeek.length / users.length) * 100}%
                 </h3>
               </div>
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Users This Month</p>
+                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
                   {' '}
                   {Math.floor(activeUsersThisMonth.length / users.length) * 100}
                   %
                 </h3>
               </div>
-              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center">
+              <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Daily Active Users</p>
+                <p className="text-xs">
+                  (70% participation rate in the current month OR 3 messages per
+                  active day)
+                </p>
                 <h3>
                   {Math.floor(dailyActiveUsers.length / users.length) * 100}%
                 </h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Average Message Count / Day</p>
+                <p className="text-xs">(considering all users)</p>
                 <h3> {messagesPerDay}</h3>
               </div>
             </div>
