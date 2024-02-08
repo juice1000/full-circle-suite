@@ -16,19 +16,19 @@ export interface User {
   subscriptionStartDate: Date;
   subscriptionEndDate: Date | null;
   firstname: string;
+  children: Child[];
+  introduction: string;
+  initialIntroduction: string;
   lastname?: string;
   role?: string;
   archeType?: string;
   parentingConcerns?: string;
-  children: Child[];
   email?: string;
-  birthdate: Date;
+  birthdate?: Date;
   numberOfChildren?: number;
-  introduction?: string;
-  initialIntroduction: string;
   exerciseName?: string;
   exerciseStep?: number;
-  exerciseLastParticipated: Date;
+  exerciseLastParticipated?: Date;
 }
 
 export interface Child {

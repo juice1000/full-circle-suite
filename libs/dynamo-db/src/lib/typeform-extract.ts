@@ -81,7 +81,9 @@ export function extractSignupUserInformation(formData: any) {
   const phoneNumberField = answers.find(
     (answer) => answer.type === 'phone_number'
   );
-  const phoneNumber = phoneNumberField.phone_number.replace('+', '');
+  const phoneNumber = phoneNumberField
+    ? phoneNumberField.phone_number.replace('+', '')
+    : '';
   const emailField = answers.find((answer) => answer.type === 'email');
   const stressScore = evaluationArray.find(
     (evaluation) => evaluation.key === 'stressmanagement'
@@ -104,17 +106,17 @@ export function extractSignupUserInformation(formData: any) {
 
   const user: User = {
     id: uuidv4(),
-    firstname: firstNameField.answer,
+    firstname: firstNameField.answer || '',
     lastname: '',
     birthdate: null,
-    role: roleField.answer,
+    role: roleField.answer || '',
     created: new Date(),
-    archeType: archetypeField.value,
+    archeType: archetypeField.value || '',
     phone: phoneNumber,
-    email: emailField.email,
-    numberOfChildren: numberOfChildrenField.value,
-    stressScore: stressScore.value,
-    parentingConcerns: parentingConcerns.answer,
+    email: emailField.email || '',
+    numberOfChildren: numberOfChildrenField.value || '',
+    stressScore: stressScore.value || 0,
+    parentingConcerns: parentingConcerns.answer || '',
 
     children: extractedBabies,
 
