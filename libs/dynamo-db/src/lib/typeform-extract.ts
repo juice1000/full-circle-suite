@@ -169,7 +169,7 @@ function extractBabies(qaArray: any): Child[] {
 }
 
 function getArchetypePrompt(archeType: string, userName: string): string {
-  const archetypePrompt = `The following describes the archetype of the ${userName}: `;
+  const archetypePrompt = `The following describes the archetype of ${userName}: `;
   if (archeType === 'Mindful Mentor') {
     return (
       archetypePrompt +
@@ -209,7 +209,7 @@ function craftUserIntroduction(user: User) {
 }
 
 function craftInitialIntroduction(user: User) {
-  const userStressScoreExplanation = `The user's stress level score is on a scale of 1-5 (1 being the least stressed and 5 being the most stressed) at ${user.stressScore}.`;
+  const userStressScoreExplanation = `The user's stress level score is on a scale of 0-5 (0 being the least stressed and 5 being the most stressed) at ${user.stressScore}.`;
 
   const initialIntroduction =
     user.introduction +

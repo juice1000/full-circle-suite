@@ -76,7 +76,7 @@ export async function interpretStressLevel(
   console.log('\nCalling interpretStressLevel\n');
   const openaiClient = gptSetup();
 
-  const systemPrompt = `Provide a stress level evaluation for the user based on the given messages. Use a number between 1 and 5, where 1 indicates high stress or sadness, and 5 indicates low stress or cheerfulness. Consider the user's emotional state in their most recent message as having a greater impact. Give a single number as your response.`;
+  const systemPrompt = `Provide a stress level evaluation for the user based on the given messages. Use a number between 0 and 5, where 0 indicates high stress or sadness, and 5 indicates low stress or cheerfulness. Consider the user's emotional state in their most recent message as having a greater impact. Give a single number as your response.`;
   const messages = [
     {
       role: 'system',
