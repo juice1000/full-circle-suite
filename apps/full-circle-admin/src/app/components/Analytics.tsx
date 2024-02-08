@@ -33,8 +33,14 @@ const Analytics = () => {
             });
           })
         ).then((userMessages) => {
-          // console.log('userMessages: ', userMessages);
-          setUsers(userMessages);
+          const filteredUserMessages = userMessages.filter(
+            (userMessage) =>
+              !['4917643209870', '6583226020', '6583226069'].includes(
+                userMessage.user.phone
+              )
+          ); // Those are test numbers from founders
+
+          setUsers(filteredUserMessages);
           setLoaded(true);
         });
       }
@@ -249,13 +255,15 @@ function getTimeSetupToFirstMessage(users: UserMessages[]) {
       message.created.getTime()
     );
     const earliestMessageTime = Math.min(...messagesCreated);
+
     const firstMessage = user.messages.find(
       (message) => message.created.getTime() === earliestMessageTime
     );
     if (!firstMessage) return 0;
     return (
       // we get the hourly difference
-      (firstMessage.created.getTime() - user.user.created.getTime()) / 3600000
+      (firstMessage.created.getTime() - user.user.created.getTime()) /
+      (1000 * 60 * 60)
     );
   });
 }
