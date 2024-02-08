@@ -19,16 +19,16 @@ export interface User {
   children: Child[];
   introduction: string;
   initialIntroduction: string;
+  archeType: string;
+  role: string;
+  parentingConcerns: string;
+  birthdate: Date | null;
+  numberOfChildren: number;
+  exerciseLastParticipated: Date;
+  email: string;
   lastname?: string;
-  role?: string;
-  archeType?: string;
-  parentingConcerns?: string;
-  email?: string;
-  birthdate?: Date;
-  numberOfChildren?: number;
   exerciseName?: string;
   exerciseStep?: number;
-  exerciseLastParticipated?: Date;
 }
 
 export interface Child {

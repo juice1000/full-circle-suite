@@ -61,7 +61,9 @@ export async function writeUser(user: User) {
     ...user,
     created: user.created.toISOString(),
     birthdate: user.birthdate ? user.birthdate.toISOString() : null,
-    exerciseLastParticipated: user.exerciseLastParticipated.toISOString(),
+    exerciseLastParticipated: user.exerciseLastParticipated
+      ? user.exerciseLastParticipated.toISOString()
+      : null,
     subscriptionStartDate: user.subscriptionStartDate.toISOString(),
     subscriptionEndDate: user.subscriptionEndDate
       ? user.subscriptionEndDate.toISOString()

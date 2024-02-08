@@ -69,24 +69,24 @@ export function extractSignupUserInformation(formData: any) {
   // const firstNameField = qaArray.find((qa) => qa.id === 'cycC1n2TmlnU');
   // const roleField = qaArray.find((qa) => qa.id === '8QkRAFm3vff2');
   // const parentingConcerns = qaArray.find((qa) => qa.id === '8xeA5FgsrOLC');
-  const firstNameField = qaArray.find((qa) => qa.id === 'RMuK1snn8jz7');
-  const roleField = qaArray.find((qa) => qa.id === 'BotXRIB1uqMF');
-  const parentingConcerns = qaArray.find((qa) => qa.id === 't2R2WzkcDfBd');
+  const firstNameField = qaArray.find((qa: any) => qa.id === 'RMuK1snn8jz7');
+  const roleField = qaArray.find((qa: any) => qa.id === 'BotXRIB1uqMF');
+  const parentingConcerns = qaArray.find((qa: any) => qa.id === 't2R2WzkcDfBd');
   const numberOfChildrenField = evaluationArray.find(
-    (evaluation) => evaluation.key === 'numberofchildren'
+    (evaluation: any) => evaluation.key === 'numberofchildren'
   );
   const archetypeField = evaluationArray.find(
-    (evaluation) => evaluation.key === 'archetype'
+    (evaluation: any) => evaluation.key === 'archetype'
   );
   const phoneNumberField = answers.find(
-    (answer) => answer.type === 'phone_number'
+    (answer: any) => answer.type === 'phone_number'
   );
   const phoneNumber = phoneNumberField
     ? phoneNumberField.phone_number.replace('+', '')
     : '';
-  const emailField = answers.find((answer) => answer.type === 'email');
+  const emailField = answers.find((answer: any) => answer.type === 'email');
   const stressScore = evaluationArray.find(
-    (evaluation) => evaluation.key === 'stressmanagement'
+    (evaluation: any) => evaluation.key === 'stressmanagement'
   );
 
   // We extract the names
@@ -106,17 +106,17 @@ export function extractSignupUserInformation(formData: any) {
 
   const user: User = {
     id: uuidv4(),
-    firstname: firstNameField.answer || '',
+    firstname: firstNameField?.answer || '',
     lastname: '',
     birthdate: null,
-    role: roleField.answer || '',
+    role: roleField?.answer || '',
     created: new Date(),
-    archeType: archetypeField.value || '',
+    archeType: archetypeField?.value || '',
     phone: phoneNumber,
-    email: emailField.email || '',
-    numberOfChildren: numberOfChildrenField.value || '',
-    stressScore: stressScore.value || 0,
-    parentingConcerns: parentingConcerns.answer || '',
+    email: emailField?.email || '',
+    numberOfChildren: numberOfChildrenField?.value || '',
+    stressScore: stressScore?.value || 0,
+    parentingConcerns: parentingConcerns?.answer || '',
 
     children: extractedBabies,
 
@@ -140,20 +140,20 @@ export function extractSignupUserInformation(formData: any) {
 
 function extractBabies(qaArray: any): Child[] {
   const babyRegex = new RegExp('first name', 'i');
-  const babies = qaArray.filter((qa) => qa.question.match(babyRegex));
+  const babies = qaArray.filter((qa: any) => qa.question.match(babyRegex));
 
-  const extractedBabies = [];
-  babies.forEach((baby) => {
+  const extractedBabies: Child[] = [];
+  babies.forEach((baby: any) => {
     // We search for all fields that contain the reference in the question
     const ref = baby.ref;
 
-    const babyFields = qaArray.filter((qa) => qa.question.includes(ref));
+    const babyFields = qaArray.filter((qa: any) => qa.question.includes(ref));
 
     // We create a baby object that has all the referenced fields
-    let babyObject;
+    let babyObject: Child;
     if (babyFields.length === 1) {
       babyObject = {
-        name: baby.answer,
+        name: baby?.answer,
         birthdate: new Date(),
         sensitivity: babyFields[0].answer,
       };
