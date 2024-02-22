@@ -17,34 +17,41 @@ const Analytics = () => {
   const [users, setUsers] = useState<UserMessages[]>([]);
 
   useEffect(() => {
-    getUsers().then((users) => {
-      if (users) {
-        Promise.all(
-          users.map((user: User) => {
+    getUsers()
+      .then(async (users) => {
+        if (users && users.length > 0) {
+          const userMessages: UserMessages[] = [];
+
+          let userItem = users.shift();
+          while (userItem) {
+            const user = { ...userItem };
+
             user.created = new Date(user.created);
-            return getMessages(user.id).then((messages) => {
+            const messages = await getMessages(user.id);
+            if (messages && messages.length > 0) {
               messages.forEach((message: Message) => {
                 message.created = new Date(message.created);
               });
-              return {
-                user: user,
-                messages: messages,
-              };
+            }
+            userMessages.push({
+              user: user,
+              messages: messages && messages.length > 0 ? messages : [],
             });
-          })
-        ).then((userMessages) => {
+            userItem = users.shift();
+          }
           const filteredUserMessages = userMessages.filter(
-            (userMessage) =>
+            (userMessage: UserMessages) =>
               !['4917643209870', '6583226020', '6583226069'].includes(
                 userMessage.user.phone
               )
-          ); // Those are test numbers from founders
+          );
 
           setUsers(filteredUserMessages);
-          setLoaded(true);
-        });
-      }
-    });
+        }
+      })
+      .then(() => {
+        setLoaded(true);
+      });
   }, []);
 
   const newUsersThisMonth = getNewUsersThisMonth(users);
@@ -54,7 +61,6 @@ const Analytics = () => {
   const usersThatSentMessages = getUsersThatSentMessages(users);
   const dailyActiveUsers = getDailyActiveUserRatio(users);
   const timeSetupToFirstMessage = getTimeSetupToFirstMessage(users);
-  // console.log('usersToday: ', usersToday);
 
   const messagesPerDay = averageMessagesPerDay(users);
   return (
@@ -92,7 +98,10 @@ const Analytics = () => {
                 <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
                   {' '}
-                  {Math.floor(activeUsersThisWeek.length / users.length) * 100}%
+                  {Math.round(
+                    (activeUsersThisWeek.length / users.length) * 100
+                  )}
+                  %
                 </h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
@@ -100,7 +109,9 @@ const Analytics = () => {
                 <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
                   {' '}
-                  {Math.floor(activeUsersThisMonth.length / users.length) * 100}
+                  {Math.round(
+                    (activeUsersThisMonth.length / users.length) * 100
+                  )}
                   %
                 </h3>
               </div>
@@ -111,7 +122,7 @@ const Analytics = () => {
                   active day)
                 </p>
                 <h3>
-                  {Math.floor(dailyActiveUsers.length / users.length) * 100}%
+                  {Math.round((dailyActiveUsers.length / users.length) * 100)}%
                 </h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
@@ -151,13 +162,14 @@ function getUsersToday(users: UserMessages[]) {
 
 function getActiveUsersThisWeek(users: UserMessages[]) {
   return users.filter((user: UserMessages) => {
-    return (
+    const filteredUsers =
       user.messages.find(
         (message: Message) =>
           getWeek(message.created) === getWeek(today) &&
           message.created.getFullYear() === today.getFullYear()
-      ) !== undefined
-    );
+      ) !== undefined;
+
+    return filteredUsers;
   });
 }
 
@@ -214,12 +226,13 @@ function averageMessagesPerDay(users: UserMessages[]) {
 
     const uniqueCreatedDates = [...new Set(messagesCreated)];
 
-    const result = messagesPerDayCount(messagesCreated);
-    return Math.round(
-      result.reduce((acc, curr) => acc + curr, 0) / uniqueCreatedDates.length
+    const messagesPerDayCnt = messagesPerDayCount(messagesCreated);
+    const messagesPerDay = Math.round(
+      messagesPerDayCnt.reduce((acc, curr) => acc + curr, 0) /
+        uniqueCreatedDates.length
     );
+    return messagesPerDay ? messagesPerDay : 0;
   });
-  // console.log(messagesPerDay);
   return Math.round(
     messagesPerDay.reduce((acc, curr) => acc + curr, 0) / messagesPerDay.length
   );
