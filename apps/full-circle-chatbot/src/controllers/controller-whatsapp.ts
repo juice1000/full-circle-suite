@@ -21,7 +21,7 @@ export async function messageProcessor(req: Request, res: Response) {
       console.log('not a registered phone number: ', phone);
       sendUserMessage(
         phone,
-        'Hello, you seem to be not registered with our service. Please sign up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.'
+        `Hi! It looks like you’re not subscribed. Ria's ready to help! Support our impact enterprise at the cost of a coffee a month! Enjoy our limited early bird price of SGD4.97/month, renewed quarterly. Cancel anytime. Head to:  https://buy.stripe.com/bIY28W7LV6zw5S8bII`
       );
     } else if (
       user.subscriptionEndDate &&
@@ -33,7 +33,7 @@ export async function messageProcessor(req: Request, res: Response) {
       console.log('subscription ended for: ', user.id);
       sendUserMessage(
         phone,
-        `Hello, your subscription seems to have expired. Please renew your subscription up at https://www.fullcircle.family/ or contact us at hello@fullcircle.family in case you are facing issues with our service.`
+        `Hi ${user.firstname}! I’ve had a great time chatting with you. I hope I was helpful! Please help me fill out this 10 min survey form to let me know how I performed: https://forms.fillout.com/t/saBfNyMmMtus`
       );
     } else if (message.type !== 'text') {
       sendUserMessage(
