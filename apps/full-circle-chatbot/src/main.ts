@@ -1,24 +1,25 @@
 import express, { Request, Response } from 'express';
 import session from 'express-session';
+import Stripe from 'stripe';
 import { messageProcessor } from './controllers/controller-whatsapp';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import {
   extractSignupUserInformation,
-  writeSystemPrompt,
+  // writeSystemPrompt,
 } from '@libs/dynamo-db';
 
 // ***************************************** NX LIBRARIES ***************************************
 
 import {
   initializeDB,
-  createExercise,
-  getExercise,
+  // createExercise,
+  // getExercise,
   createUser,
-  User,
+  // User,
 } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
-import { exampleSystemPrompt } from '@libs/gpt';
+// import { exampleSystemPrompt } from '@libs/gpt';
 
 // deleteTables();
 initializeDB();
@@ -36,6 +37,42 @@ const sessionMiddleware = session({
   saveUninitialized: true,
 });
 app.use(sessionMiddleware);
+
+// This is your Stripe CLI webhook secret for testing your endpoint locally.
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripe = new Stripe(endpointSecret);
+
+// Stripe Webhook (Needs to stand before the JSON middleware to be able to prepare the raw body)
+app.post(
+  '/stripe-webhook',
+  express.raw({ type: 'application/json' }),
+  (request: Request, response: Response) => {
+    const sig = request.headers['stripe-signature'];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      console.log(`Webhook Error: ${err.message}`);
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      console.log('checkout session completed', session);
+
+      // Handle the event
+    }
+    if (event.type === 'payment_intent.created') {
+      const paymentIntent = event.data.object;
+      console.log('payment intent created', paymentIntent);
+    }
+
+    // Return a response to acknowledge receipt of the event
+    response.json({ received: true });
+  }
+);
 
 // Accept JSON Request and Response
 app.use(express.json());
@@ -82,74 +119,74 @@ app.post('/create-user', async (req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-// TODO: this function is still in the making and only for demo purposes
-app.get('/create-demo-user', async (req: Request, res: Response) => {
-  // TODO: create user profile after signup
-  console.log('create demo user');
+// // TODO: this function is still in the making and only for demo purposes
+// app.get('/create-demo-user', async (req: Request, res: Response) => {
+//   // TODO: create user profile after signup
+//   console.log('create demo user');
 
-  const user: User = {
-    id: uuidv4(),
-    firstname: 'Grace',
-    lastname: 'Zhu',
-    role: 'mother',
-    birthdate: new Date('1996-04-25'),
-    created: new Date(),
-    archeType: 'hard-working',
-    phone: '6583226020',
-    email: '',
-    numberOfChildren: 2,
-    stressScore: 2,
-    parentingConcerns: 'sleep, freetime',
+//   const user: User = {
+//     id: uuidv4(),
+//     firstname: 'Grace',
+//     lastname: 'Zhu',
+//     role: 'mother',
+//     birthdate: new Date('1996-04-25'),
+//     created: new Date(),
+//     archeType: 'hard-working',
+//     phone: '6583226020',
+//     email: '',
+//     numberOfChildren: 2,
+//     stressScore: 2,
+//     parentingConcerns: 'sleep, freetime',
 
-    children: [],
+//     children: [],
 
-    introduction: '',
-    initialIntroduction: '',
-    exerciseMode: false,
-    exerciseName: '',
-    exerciseStep: 0,
-    exerciseLastParticipated: new Date(),
-    subscriptionStartDate: new Date(),
-    subscriptionEndDate: null,
-  };
-  await createUser(user);
+//     introduction: '',
+//     initialIntroduction: '',
+//     exerciseMode: false,
+//     exerciseName: '',
+//     exerciseStep: 0,
+//     exerciseLastParticipated: new Date(),
+//     subscriptionStartDate: new Date(),
+//     subscriptionEndDate: null,
+//   };
+//   await createUser(user);
 
-  res.sendStatus(200);
-});
+//   res.sendStatus(200);
+// });
 
-app.get('/create-exercise', async (req, res) => {
-  // TODO: create exercises through admin panel
-  console.log('create demo exercise');
-  const name = 'mental-distress';
-  const steps = 12;
-  const questions = [
-    `I understand you've been facing tough challenges recently. Can you share more about what specifically has been happening?`,
-    `Before we explore strategies, can you provide more details? Are there specific patterns or triggers you've noticed?`,
-    `Regarding hunger, how are the baby's feeding patterns during the day?`,
-    `Have you implemented any bedtime routine so far?`,
-    `Now, let's talk about your own sleep. How has it been for you during these challenging nights?`,
-    `Have you considered adjusting your sleeping space?`,
-    `Now, let's explore your emotional well-being. Have you noticed any changes in your mood or interest in activities you used to enjoy?`,
-    `Now, regarding your energy level, how has it been lately?`,
-    `Now, let me ask you two important questions: During the past month, have you often been bothered by feeling down, depressed, or hopeless?`,
-    `Another question: During the past month, have you often been bothered by having little interest or pleasure in doing things you normally enjoyed?`,
-    `Now, regarding nighttime routines, let's explore evidence-based strategies tailored to both the baby's needs and yours.`,
-    `There are professionals and evidence-based approaches available to assist you. Would you be open to exploring some options?`,
-  ];
-  const existingExercise = await getExercise(name);
-  if (!existingExercise) {
-    await createExercise(name, steps, questions);
-  } else {
-    console.error('exercise already exists');
-  }
+// app.get('/create-exercise', async (req, res) => {
+//   // TODO: create exercises through admin panel
+//   console.log('create demo exercise');
+//   const name = 'mental-distress';
+//   const steps = 12;
+//   const questions = [
+//     `I understand you've been facing tough challenges recently. Can you share more about what specifically has been happening?`,
+//     `Before we explore strategies, can you provide more details? Are there specific patterns or triggers you've noticed?`,
+//     `Regarding hunger, how are the baby's feeding patterns during the day?`,
+//     `Have you implemented any bedtime routine so far?`,
+//     `Now, let's talk about your own sleep. How has it been for you during these challenging nights?`,
+//     `Have you considered adjusting your sleeping space?`,
+//     `Now, let's explore your emotional well-being. Have you noticed any changes in your mood or interest in activities you used to enjoy?`,
+//     `Now, regarding your energy level, how has it been lately?`,
+//     `Now, let me ask you two important questions: During the past month, have you often been bothered by feeling down, depressed, or hopeless?`,
+//     `Another question: During the past month, have you often been bothered by having little interest or pleasure in doing things you normally enjoyed?`,
+//     `Now, regarding nighttime routines, let's explore evidence-based strategies tailored to both the baby's needs and yours.`,
+//     `There are professionals and evidence-based approaches available to assist you. Would you be open to exploring some options?`,
+//   ];
+//   const existingExercise = await getExercise(name);
+//   if (!existingExercise) {
+//     await createExercise(name, steps, questions);
+//   } else {
+//     console.error('exercise already exists');
+//   }
 
-  res.sendStatus(200);
-});
+//   res.sendStatus(200);
+// });
 
-app.get('/create-system-prompt', async (req, res) => {
-  // TODO: create system prompts through admin panel
-  console.log('create system prompt');
-  const prompt = exampleSystemPrompt;
-  await writeSystemPrompt(prompt);
-  res.sendStatus(200);
-});
+// app.get('/create-system-prompt', async (req, res) => {
+//   // TODO: create system prompts through admin panel
+//   console.log('create system prompt');
+//   const prompt = exampleSystemPrompt;
+//   await writeSystemPrompt(prompt);
+//   res.sendStatus(200);
+// });
