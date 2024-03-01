@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@full-circle-suite/stripe-subscription-handler": [
+        "libs/stripe/src/index.ts"
+      ],
       "@libs/dynamo-db": ["libs/dynamo-db/src/index.ts"],
       "@libs/dynamo-db-cloud-api": ["libs/dynamo-db-api/src/index.ts"],
       "@libs/gpt": ["libs/gpt/src/index.ts"],

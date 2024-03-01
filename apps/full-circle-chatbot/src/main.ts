@@ -19,6 +19,7 @@ import {
 } from '@libs/dynamo-db';
 // import { deleteTables } from '@libs/dynamo-db';
 import { whatsAppVerify } from '@libs/whats-app';
+import { stripeEventHandler } from './controllers/controller-stripe';
 // import { exampleSystemPrompt } from '@libs/gpt';
 
 // deleteTables();
@@ -48,8 +49,7 @@ app.post(
   express.raw({ type: 'application/json' }),
   (request: Request, response: Response) => {
     const sig = request.headers['stripe-signature'];
-    let event;
-
+    let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
     } catch (err) {
@@ -58,17 +58,7 @@ app.post(
       return;
     }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      console.log('checkout session completed', session);
-
-      // Handle the event
-    }
-    if (event.type === 'payment_intent.created') {
-      const paymentIntent = event.data.object;
-      console.log('payment intent created', paymentIntent);
-    }
-
+    stripeEventHandler(event, stripe);
     // Return a response to acknowledge receipt of the event
     response.json({ received: true });
   }
