@@ -41,8 +41,7 @@ app.use(sessionMiddleware);
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-const stripe = new Stripe(endpointSecret);
-
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
 // Stripe Webhook (Needs to stand before the JSON middleware to be able to prepare the raw body)
 app.post(
   '/stripe-webhook',

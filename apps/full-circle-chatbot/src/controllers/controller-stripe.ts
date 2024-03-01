@@ -1,21 +1,44 @@
 import Stripe from 'stripe';
+import {
+  subscriptionStatusCheck,
+  updateSubscriptionRenewal,
+  SubscriptionInfo,
+} from '@full-circle-suite/stripe-subscription-handler';
+import { User, writeUser, getUser } from '@libs/dynamo-db';
 
 export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
-  console.log('event', event.data.object);
-  // if (event.type === 'checkout.session.completed') {
-  //   const session = event.data.object;
-  //   console.log('checkout session completed', session);
+  //   console.log('event', event.data.object);
 
-  //   // Handle the event
-  // }
-  // if (event.type === 'payment_intent.created') {
-  //   const paymentIntent = event.data.object;
-  //   console.log('payment intent created', paymentIntent);
-  // }
-  if (event.type === 'customer.subscription.created') {
-    // pass
+  let subscriptionInfo: SubscriptionInfo;
+  const subscriptionEvents = [
+    'customer.subscription.created',
+    'customer.subscription.deleted',
+    'customer.subscription.paused',
+    'customer.subscription.resumed',
+    'customer.subscription.updated',
+  ];
+
+  // Succuessful Payment and subscription continuation
+  if (event.type === 'invoice.paid') {
+    // console.log('payment intent created', event);
+    subscriptionInfo = await updateSubscriptionRenewal(stripe, event);
   }
-  if (event.type === 'customer.subscription.deleted') {
-    // pass
+  // Other subscription events that we're not sure about yet
+  if (subscriptionEvents.includes(event.type)) {
+    subscriptionInfo = await subscriptionStatusCheck(stripe, event);
   }
+  if (subscriptionInfo && subscriptionInfo.customerPhone) {
+    console.log('Subscription Info:', subscriptionInfo);
+    // TODO: Update User Subscription Status
+    const user: User = await getUser(subscriptionInfo.customerPhone);
+    if (user) {
+      if (subscriptionInfo.active) {
+        user.subscriptionEndDate = subscriptionInfo.subscriptionEnd;
+      } else {
+        user.subscriptionEndDate = null;
+      }
+      await writeUser(user);
+    }
+  }
+  return;
 }
