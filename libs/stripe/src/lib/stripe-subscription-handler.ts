@@ -29,10 +29,10 @@ export async function subscriptionStatusCheck(
     const subscriptionInfo: SubscriptionInfo = {
       active: false,
       subscriptionEnd: subscriptionEnd,
-      customerPhone: customer.phone.slice(1),
+      customerPhone: customer.phone ? customer.phone.slice(1) : '',
       customerEmail: customer.email,
-      customerFirstName: customer.name.split(' ')[0] || '',
-      customerLastName: customer.name.split(' ')[1] || '',
+      customerFirstName: customer.name ? customer.name.split(' ')[0] : '',
+      customerLastName: customer.name ? customer.name.split(' ')[1] : '',
     };
     if (['active', 'trailing'].includes(subscription.status)) {
       console.log('Subscription Active');
