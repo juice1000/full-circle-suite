@@ -29,9 +29,13 @@ export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
   }
   if (subscriptionInfo && subscriptionInfo.customerPhone) {
     console.log('Subscription Info:', subscriptionInfo);
-    // TODO: Update User Subscription Status
+    // Update subscription status in database
     const user: User = await getUser(subscriptionInfo.customerPhone);
     if (user) {
+      // In case the email was updated in Stripe
+      user.email = subscriptionInfo.customerEmail;
+      // user.firstname = subscriptionInfo.customerFirstName; // we omit this since the user chose their own name during the questionaire
+      user.lastname = subscriptionInfo.customerLastName;
       if (subscriptionInfo.active) {
         user.subscriptionEndDate = subscriptionInfo.subscriptionEnd;
       } else {
