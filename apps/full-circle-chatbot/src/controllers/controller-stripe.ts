@@ -4,7 +4,7 @@ import {
   updateSubscriptionRenewal,
   SubscriptionInfo,
 } from '@full-circle-suite/stripe-subscription-handler';
-import { User, writeUser, getUser } from '@libs/dynamo-db';
+import { User, writeUser, getUser, getUserFromEmail } from '@libs/dynamo-db';
 
 export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
   //   console.log('event', event.data.object);
@@ -30,7 +30,10 @@ export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
   if (subscriptionInfo && subscriptionInfo.customerPhone) {
     console.log('Subscription Info:', subscriptionInfo);
     // Update subscription status in database
-    const user: User = await getUser(subscriptionInfo.customerPhone);
+    let user: User = await getUser(subscriptionInfo.customerPhone);
+    if (!user) {
+      user = await getUserFromEmail(subscriptionInfo.customerEmail);
+    }
     if (user) {
       // In case the email was updated in Stripe
       user.email = subscriptionInfo.customerEmail;

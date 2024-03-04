@@ -15,25 +15,22 @@ export async function messageProcessor(req: Request, res: Response) {
     // Retrieve user profile
     const user = await getUser(phone);
     // return;
-    if (!user) {
+    if (!user || !user.subscriptionEndDate) {
       // User not registered with the service yet
       // Send message to this phone number to sign up for services
       console.log('not a registered phone number: ', phone);
       sendUserMessage(
         phone,
-        `Hi! It looks like you’re not subscribed. Ria's ready to help! Support our impact enterprise at the cost of a coffee a month! Enjoy our limited early bird price of SGD4.97/month, renewed quarterly. Cancel anytime. Head to:  https://buy.stripe.com/bIY28W7LV6zw5S8bII`
+        `Hi! It looks like you're not subscribed. Ria's ready to help! Support our impact enterprise at the cost of a coffee a month! Enjoy our limited early bird price of SGD4.97/month, renewed quarterly. Cancel anytime. Head to:  https://buy.stripe.com/bIY28W7LV6zw5S8bII`
       );
-    } else if (
-      user.subscriptionEndDate &&
-      user.subscriptionEndDate < new Date()
-    ) {
+    } else if (user.subscriptionEndDate < new Date()) {
       // User subscription has expired
       // Send message to this phone number to refresh subscription
 
       console.log('subscription ended for: ', user.id);
       sendUserMessage(
         phone,
-        `Hi ${user.firstname}! I’ve had a great time chatting with you. I hope I was helpful! Please help me fill out this 10 min survey form to let me know how I performed: https://forms.fillout.com/t/saBfNyMmMtus`
+        `Hi ${user.firstname}! I've had a great time chatting with you. I hope I was helpful! Please help me fill out this 10 min survey form to let me know how I performed: https://forms.fillout.com/t/saBfNyMmMtus`
       );
     } else if (message.type !== 'text') {
       sendUserMessage(

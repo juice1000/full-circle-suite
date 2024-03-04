@@ -55,6 +55,57 @@ export async function getUser(phone: string): Promise<User | null> {
   }
 }
 
+export async function getUserFromEmail(email: string): Promise<User | null> {
+  try {
+    const params = new ScanCommand({
+      TableName: tableName,
+      FilterExpression: 'email = :value',
+      ExpressionAttributeValues: {
+        ':value': email, // Use the appropriate data type (S for String, N for Number, etc.)
+      },
+    });
+    //   const command = new GetItemCommand(params);
+    const response = await ddbDocClient.send(params);
+
+    if (response.Items && response.Items.length > 0) {
+      const item = response.Items[0];
+      const user: User = {
+        id: item.id,
+        created: new Date(item.created),
+        firstname: item.firstname,
+        lastname: item.lastname,
+        birthdate: new Date(item.birthdate),
+        role: item.role,
+        archeType: item.archeType,
+        parentingConcerns: item.parentingConcerns,
+        children: item.children ? JSON.parse(item.children) : [],
+        phone: item.phone,
+        stressScore: item.stressScore,
+        email: item.email,
+        numberOfChildren: item.numberOfChildren,
+        introduction: item.introduction,
+        initialIntroduction: item.initialIntroduction,
+        exerciseMode: item.exerciseMode,
+        exerciseName: item.exerciseName,
+        exerciseStep: item.exerciseStep,
+        exerciseLastParticipated: new Date(item.exerciseLastParticipated),
+        subscriptionStartDate: new Date(item.subscriptionStartDate),
+        subscriptionEndDate: item.subscriptionEndDate
+          ? new Date(item.subscriptionEndDate)
+          : null,
+      };
+
+      return user;
+    } else {
+      console.log('no user through email found');
+      return null;
+    }
+  } catch (err) {
+    console.log('error retrieving user', err);
+    return null;
+  }
+}
+
 export async function writeUser(user: User) {
   // convert dates to iso strings
   const convertedUser = {
