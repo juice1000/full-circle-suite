@@ -104,13 +104,16 @@ export function extractSignupUserInformation(formData: any) {
   // console.log('infantBirtdateFiled', infantBirtdateFiled.answer);
   // console.log('infantCharacteristicsField', infantCharacteristicsField.answer);
 
+  const today = new Date();
+  const threeMonthsAhead = new Date();
+  threeMonthsAhead.setDate(threeMonthsAhead.getDate() + 7);
   const user: User = {
     id: uuidv4(),
     firstname: firstNameField?.answer || '',
     lastname: '',
     birthdate: null,
     role: roleField?.answer || '',
-    created: new Date(),
+    created: today,
     archeType: archetypeField?.value || '',
     phone: phoneNumber,
     email: emailField?.email || '',
@@ -126,9 +129,9 @@ export function extractSignupUserInformation(formData: any) {
     exerciseMode: false,
     exerciseName: '',
     exerciseStep: 0,
-    exerciseLastParticipated: new Date(),
-    subscriptionStartDate: new Date(),
-    subscriptionEndDate: null,
+    exerciseLastParticipated: today,
+    subscriptionStartDate: today,
+    subscriptionEndDate: threeMonthsAhead,
   };
 
   user.introduction = craftUserIntroduction(user);
