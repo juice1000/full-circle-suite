@@ -43,6 +43,11 @@ export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
         user.subscriptionEndDate = subscriptionInfo.subscriptionEnd;
       } else {
         user.subscriptionEndDate = new Date();
+        console.log(
+          'Subscription has ended for: ',
+          user.id,
+          user.subscriptionEndDate
+        );
       }
       await writeUser(user);
     }

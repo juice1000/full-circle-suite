@@ -61,15 +61,10 @@ export async function updateSubscriptionRenewal(
       invoice.customer as string
     )) as Stripe.Customer;
     console.log('Invoice for', customer.name, 'has been paid!');
-    console.log('Invoice Status: ', invoice.status);
-
-    const today = new Date();
-    const threeMonthsAhead = new Date(today);
-    threeMonthsAhead.setMonth(today.getMonth() + 3);
 
     const subscriptionInfo: SubscriptionInfo = {
       active: true,
-      subscriptionEnd: threeMonthsAhead,
+      subscriptionEnd: new Date(invoice.lines.data[0].period.end * 1000),
       customerPhone: customer.phone.slice(1), // what's app cloud api doesn't accept the + sign
       customerEmail: customer.email,
       customerFirstName: customer.name.split(' ')[0] || '',
