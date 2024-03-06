@@ -65,3 +65,8 @@ export interface GuidedExercise {
   steps: number;
   questions: string[];
 }
+
+export interface BotMessage {
+  id: string;
+  message: string;
+}

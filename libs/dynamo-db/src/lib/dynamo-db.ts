@@ -13,6 +13,7 @@ import {
   selectedTrainingDataSchema,
   guidedExerciseSchema,
   gptModelSchema,
+  botMessageSchema,
 } from './table-schemas';
 
 let dbClient: DynamoDBClient;
@@ -84,6 +85,13 @@ export async function initializeDB() {
       if (!results.TableNames.includes('full-circle-gpt-models')) {
         await createTable(dbClient, gptModelSchema, 'full-circle-gpt-models');
       }
+      if (!results.TableNames.includes('full-circle-bot-messages')) {
+        await createTable(
+          dbClient,
+          botMessageSchema,
+          'full-circle-bot-messages'
+        );
+      }
     }
 
     return;
@@ -120,6 +128,9 @@ export async function deleteTables() {
       }
       if (results.TableNames.includes('full-circle-gpt-models')) {
         await deleteTable('full-circle-gpt-models');
+      }
+      if (results.TableNames.includes('full-circle-bot-messages')) {
+        await deleteTable('full-circle-bot-messages');
       }
     }
   } catch (err) {

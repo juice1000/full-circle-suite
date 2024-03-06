@@ -6,6 +6,7 @@ import {
   Message,
   getCurrentGPTModel,
   getCurrentSystemPrompt,
+  getBotMessage,
 } from '@libs/dynamo-db';
 import { gptChatResponse } from '@libs/gpt';
 import { sendUserMessage } from '@libs/whats-app';
@@ -29,6 +30,17 @@ export async function controllerMessageLevel(user: User, messageText: string) {
   ) {
     console.error('Message has been previously sent to the server');
   } else {
+    if (!messageHistory) {
+      // Send initial onboarding message to user
+      const initialMessage = await getBotMessage('onboording-message');
+      if (initialMessage) {
+        initialMessage.message = initialMessage.message.replace(
+          '<Name>',
+          user.firstname
+        );
+        sendUserMessage(user.phone, initialMessage.message);
+      }
+    }
     // Check if current GPT model exists
     const gptModel = await getCurrentGPTModel();
     const currentSystemPrompt = await getCurrentSystemPrompt();

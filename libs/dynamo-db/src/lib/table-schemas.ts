@@ -129,3 +129,23 @@ export const guidedExerciseSchema: CreateTableCommandInput = {
   },
   TableName: 'full-circle-guided-exercises',
 };
+
+export const botMessageSchema: CreateTableCommandInput = {
+  AttributeDefinitions: [
+    {
+      AttributeName: 'id',
+      AttributeType: 'S',
+    },
+  ],
+  KeySchema: [
+    {
+      AttributeName: 'id',
+      KeyType: 'HASH',
+    },
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5,
+  },
+  TableName: 'full-circle-bot-messages',
+};

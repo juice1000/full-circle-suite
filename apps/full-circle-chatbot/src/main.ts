@@ -5,6 +5,8 @@ import { messageProcessor } from './controllers/controller-whatsapp';
 // import { v4 as uuidv4 } from 'uuid';
 import {
   extractSignupUserInformation,
+  // getBotMessage,
+  // writeBotMessage,
   // writeSystemPrompt,
 } from '@libs/dynamo-db';
 
@@ -177,5 +179,25 @@ app.post('/create-user', async (req: Request, res: Response) => {
 //   console.log('create system prompt');
 //   const prompt = exampleSystemPrompt;
 //   await writeSystemPrompt(prompt);
+//   res.sendStatus(200);
+// });
+
+// app.get('/create-demo-bot-message', async (req, res) => {
+//   const message = `Welcome <Name>! My name is Ria, your personal AI co-parent and coach. I'm here to bounce parenting ideas & tricks with you, deepen your knowledge on positive parenting, and support you through the hard times.
+// Here are tips to get the most out of our chat:
+
+// 💾Save me in your contacts as “Ria Parent Coach”
+// 📌Pin our chat so you can always find me. On iPhone, swipe right on our chat in your inbox and select “Pin”. On Android, long press our chat in your inbox.
+// 💡 If my initial response doesn't meet your needs, I encourage you to explain why to me. When you continue a conversation with me, I can provide more tailored advice & arrive at better solutions together with you!
+
+// Alright, let's get back to it. How can I help?`;
+//   await writeBotMessage('onboording-message', message);
+//   res.sendStatus(200);
+// });
+
+// app.get('/get-demo-bot-message', async (req, res) => {
+//   const d = await getBotMessage('onboording-message');
+//   console.log(d);
+
 //   res.sendStatus(200);
 // });
