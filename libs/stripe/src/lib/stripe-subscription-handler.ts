@@ -34,7 +34,7 @@ export async function subscriptionStatusCheck(
       customerFirstName: customer.name ? customer.name.split(' ')[0] : '',
       customerLastName: customer.name ? customer.name.split(' ')[1] : '',
     };
-    if (['active', 'trailing'].includes(subscription.status)) {
+    if (['active', 'trialing'].includes(subscription.status)) {
       console.log('Subscription Active');
       // handle active subscription
       subscriptionInfo.active = true;

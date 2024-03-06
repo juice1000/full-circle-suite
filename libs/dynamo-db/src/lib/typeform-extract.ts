@@ -105,8 +105,8 @@ export function extractSignupUserInformation(formData: any) {
   // console.log('infantCharacteristicsField', infantCharacteristicsField.answer);
 
   const today = new Date();
-  const threeMonthsAhead = new Date();
-  threeMonthsAhead.setDate(threeMonthsAhead.getDate() + 7);
+  // const threeMonthsAhead = new Date();
+  // threeMonthsAhead.setDate(threeMonthsAhead.getDate() + 7);
   const user: User = {
     id: uuidv4(),
     firstname: firstNameField?.answer || '',
@@ -131,7 +131,7 @@ export function extractSignupUserInformation(formData: any) {
     exerciseStep: 0,
     exerciseLastParticipated: today,
     subscriptionStartDate: today,
-    subscriptionEndDate: threeMonthsAhead,
+    subscriptionEndDate: today, // this way the user won't be able to text without a subscription
   };
 
   user.introduction = craftUserIntroduction(user);

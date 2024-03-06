@@ -42,7 +42,7 @@ export async function stripeEventHandler(event: Stripe.Event, stripe: Stripe) {
       if (subscriptionInfo.active) {
         user.subscriptionEndDate = subscriptionInfo.subscriptionEnd;
       } else {
-        user.subscriptionEndDate = null;
+        user.subscriptionEndDate = new Date();
       }
       await writeUser(user);
     }
