@@ -84,20 +84,16 @@ const Analytics = () => {
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Active Users</p>
-                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>{usersThatSentMessages.length}</h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Users Today</p>
-                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>{usersToday.length}</h3>
               </div>
 
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Users This Week</p>
-                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
-                  {' '}
                   {Math.round(
                     (activeUsersThisWeek.length / users.length) * 100
                   )}
@@ -106,7 +102,6 @@ const Analytics = () => {
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Users This Month</p>
-                <p className="text-xs">(interacted with the Chatbot)</p>
                 <h3>
                   {' '}
                   {Math.round(
@@ -117,17 +112,12 @@ const Analytics = () => {
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Daily Active Users</p>
-                <p className="text-xs">
-                  (70% participation rate in the current month OR 3 messages per
-                  active day)
-                </p>
                 <h3>
                   {Math.round((dailyActiveUsers.length / users.length) * 100)}%
                 </h3>
               </div>
               <div className="py-4 px-8 bg-primary-dark rounded-full grid justify-items-center text-center">
                 <p>Average Message Count / Day</p>
-                <p className="text-xs">(considering all users)</p>
                 <h3> {messagesPerDay}</h3>
               </div>
             </div>
@@ -198,9 +188,13 @@ function getDailyActiveUserRatio(users: UserMessages[]) {
       .map((message: Message) => {
         return message.created.toDateString();
       });
-    const uniqueDatesThisMonth = [...new Set(datesThisMonth)];
+    const uniqueDatesThisMonth = [...new Set(...datesThisMonth)];
 
     // We check if the user has sent at least 3 messages each day he used the bot
+    // if (user.user.phone === '4917643209870') {
+    //   console.log('datesThisMonth: ', datesThisMonth);
+    // }
+
     const result = isThreeMessagesPerDay(datesThisMonth);
     if (result) return true;
 
@@ -233,6 +227,12 @@ function averageMessagesPerDay(users: UserMessages[]) {
     );
     return messagesPerDay ? messagesPerDay : 0;
   });
+  // console.log(
+  //   'average message count per day: ',
+  //   messagesPerDay.reduce((acc, curr) => acc + curr, 0) / messagesPerDay.length
+  // );
+  // console.log('messages per day: ', messagesPerDay);
+
   return Math.round(
     messagesPerDay.reduce((acc, curr) => acc + curr, 0) / messagesPerDay.length
   );
@@ -252,6 +252,7 @@ function messagesPerDayCount(createdDates: string[]): number[] {
 }
 
 function isThreeMessagesPerDay(createdDates: string[]): boolean {
+  if (createdDates.length < 3) return false;
   const itemCounts = createdDates.reduce((counts, item) => {
     if (item in counts) {
       counts[item]++;
